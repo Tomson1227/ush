@@ -5,7 +5,7 @@
 
 void start_gui(void);
 char *read_line(void);
-int execute(char **args);
+void execute(t_main *interface);
 char **get_args(char **args, uint8_t *index);
 t_main *new_struct_t_main(void);
 

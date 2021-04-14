@@ -2,6 +2,9 @@
 
 char **get_args(char **args, uint8_t *index)
 {
+    if(!args[(*index)])
+        return NULL;
+    
     uint8_t count_args;
     char **select_args = NULL;
 
@@ -10,7 +13,7 @@ char **get_args(char **args, uint8_t *index)
             break;
     }
     
-    select_args = (char **) malloc((count_args + 1)* sizeof(char *));
+    select_args = (char **) calloc(count_args + 1, sizeof(char *));
     
     if(!select_args)
         mx_print_error("allocation fail");
@@ -21,30 +24,4 @@ char **get_args(char **args, uint8_t *index)
     }
 
     return select_args;
-}
-
-void start_gui(void)
-{
-    char *line;
-    char **args;
-    int status = 1;
-    t_main *main_struct = new_struct_t_main();
-
-    while (status)
-    {
-        mx_printstr(main_struct->ush.ush_name);
-        line = read_line();
-        args = mx_strsplit(mx_del_extra_spaces(line), ' ');
-        status = execute(args);
-
-        free(line);
-        free(args);
-    }
-}
-
-t_main *new_struct_t_main(void) {
-    t_main *new_struct = (t_main*)malloc(sizeof(t_main));
-
-    new_struct->ush.ush_name = mx_strdup("u$h>");
-    return new_struct;
 }
