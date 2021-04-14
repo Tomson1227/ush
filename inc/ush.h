@@ -8,5 +8,6 @@
 #include "functions.h"
 #include "macros.h"
 #include "libmx.h"
+#include "struct.h"
 
 #endif /* USH */

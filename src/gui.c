@@ -28,10 +28,11 @@ void start_gui(void)
     char *line;
     char **args;
     int status = 1;
+    t_main *main_struct = new_struct_t_main();
 
     while (status)
     {
-        mx_printstr("u$h>");
+        mx_printstr(main_struct->ush.ush_name);
         line = read_line();
         args = mx_strsplit(mx_del_extra_spaces(line), ' ');
         status = execute(args);
@@ -41,4 +42,9 @@ void start_gui(void)
     }
 }
 
+t_main *new_struct_t_main(void) {
+    t_main *new_struct = (t_main*)malloc(sizeof(t_main));
 
+    new_struct->ush.ush_name = mx_strdup("u$h>");
+    return new_struct;
+}
