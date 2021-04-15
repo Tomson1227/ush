@@ -16,6 +16,7 @@ static inline t_main *init_main_struct(void)
     interface->status = 1;
     init_args_struct(&interface->func_arg);
     init_args_struct(&interface->line_arg);
+    init_args_struct(&interface->result);
     interface->ush.ush_name = mx_strdup("u$h>");
     interface->triggers.pipe = false;
 

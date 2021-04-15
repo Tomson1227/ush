@@ -1,83 +1,131 @@
 #include "ush.h"
 
-void echo_func(t_main *interface)
+//temp struct
+typedef struct s_echo_func {
+    bool flag_n;
+    bool flag_e;
+    uint8_t index;
+}      t_echo_func;
+
+static inline void read_flags(t_main *interface, t_echo_func *flags)
 {
-    interface->status = 0;
+    for(; flags->index < interface->func_arg.number; ++flags->index) {
+        if(!mx_strncmp(interface->func_arg.value[flags->index], "-", 1)) {
+            for(int j = 1; interface->func_arg.value[flags->index][j]; ++j) {
+                if(interface->func_arg.value[flags->index][j] == 'n')
+                    flags->flag_n = 0;
+                else if(interface->func_arg.value[flags->index][j] == 'e')
+                    flags->flag_e = 1;
+                else if(interface->func_arg.value[flags->index][j] == 'E')
+                    flags->flag_e = 0;
+            }
+        }
+        else
+            break;
+    }
 }
 
-// typedef struct s_echo_func {
-//     bool flag_n;
-//     bool flag_e;
-//     uint8_t index;
-// }      t_echo_func;
+static inline t_echo_func *init_echo_struct(void)
+{
+    t_echo_func *echo_struct = (t_echo_func *) calloc(1, sizeof(t_echo_func));
+    echo_struct->flag_n = 1;
+    echo_struct->flag_e = 0;
+    echo_struct->index = 1;
 
-// static inline void read_flags(t_main *interface, t_echo_func *flags)
-// {
-//     for(; flags->index < interface->func_arg.number; flags->index) {
-//         if(!mx_strncmp(interface->func_arg.value[flags->index], "-", 1)) {
-//             for(int j = 1; interface->func_arg.value[flags->index][j]; ++j) {
-//                 if(interface->func_arg.value[flags->index][j] == 'n')
-//                     flags->flag_n = 0;
-//                 else if(interface->func_arg.value[flags->index][j] == 'e')
-//                     flags->flag_e = 1;
-//                 else if(interface->func_arg.value[flags->index][j] == 'E')
-//                     flags->flag_e = 0;
-//             }
-//         }
-//         else
-//             break;
-//     }
-// }
+    return echo_struct;
+}
 
-// static inline t_echo_func *init_echo_struct(void)
-// {
-//     t_echo_func *echo_struct;
-//     echo_struct->flag_n = 1;
-//     echo_struct->flag_e = 0;
-//     echo_struct->index = 1;
+static size_t count_escapes(char *text)
+{
+    size_t count = 0;
 
-//     return echo_struct;
-// }
+    for(size_t index = 0; text[index]; ++index) {
+        if(text[count] >= 0x7 && text[count] <= 0xD)    
+            ++count;
+    }
 
-// static void text_modify(char *text)
-// {
-//     for(size_t i = 0; text[i]; ++i) {
+    return count;
+}
 
-//     }
-// }
+static char get_excape(char c)
+{
+    switch (c) {
+        case '\a':
+            return 'a';
+        case '\b':
+            return 'b';
+        case '\f':
+            return 'f';
+        case '\n':
+            return 'n';
+        case '\r':
+            return 'r';
+        case '\t':
+            return 't';
+        case '\v':
+            return 'v';
+        default:
+            return c;
+    }
+}
 
-// void echo_func(t_main *interface)
-// {
-//     t_echo_func *flags = init_echo_struct();
+static void text_modify(char **text)
+{
 
-//     read_flags(interface, flags);
+    size_t count = count_escapes(*text);
     
-//     while(interface->func_arg.value[flags->index]) {
-//         if(flags->flag_e)
-//             text_modify(inteinterface->func_arg.value[flags->index]);
+    if(!count)
+        return;
 
-//         echo_result(interface->func_arg.value[flags->index]);
-//     }
+    char *new_str = calloc(mx_strlen(*text) + count, sizeof(char));
 
-//     if(flags->flag_n)
-//         mx_printchar('\n');
+    for(size_t i = 0, j = 0; *text[i]; ++i, ++j) {
+        if((*text[i] >= 0x7 && *text[i] <= 0xD)) {
+            new_str[j++] = '\\';
+            new_str[j] = get_excape(*text[i]);
+        }
+        else
+            new_str[j] = *text[i];
+    }
 
-//     interface->status = 1;
-// }
+    free(*text);
+    **text = *new_str;
+}
 
-// //-n не выводить в конце символ новой строки
-// //-e включить интерпретацию управляющих символов, перечисленных ниже
-// //-E отключить интерпретацию ткаих управляющих символов в СТРОКах
+void echo_func(t_main *interface)
+{
+    t_echo_func *flags = init_echo_struct();
+    read_flags(interface, flags);
 
-// /*
-// \NNN символ с ASCII кодом NNN (восьмеричное)
-// \\ обратная косая черта
-// \a тревога (BEL)
-// \b забой
-// \c подавлять символ новой строки в конце
-// \f перевод страницы
-// \n новая строка
-// \r возврат каретки
-// \t горизонтальаня табуляция
-// \v вертикальаня табуляция
-// */
+    interface->result.value = (char **) calloc(interface->func_arg.number - flags->index, sizeof(char *));
+    
+    for(interface->result.number = 0; interface->func_arg.value[flags->index];) {
+
+        if(flags->flag_e)
+            text_modify(&interface->func_arg.value[flags->index]);
+
+        interface->result.value[interface->result.number++] = interface->func_arg.value[flags->index++];
+        interface->result.value[interface->result.number] = NULL;
+    }
+
+    //confused to use flag_n with pipe together
+
+    interface->status = 1;
+}
+
+//-n не выводить в конце символ новой строки
+//-e включить интерпретацию управляющих символов, перечисленных ниже
+//-E отключить интерпретацию ткаих управляющих символов в СТРОКах
+
+/*
+\NNN символ с ASCII кодом NNN (восьмеричное)
+\\ обратная косая черта
+\a тревога (BEL)
+\b забой
+\c подавлять символ новой строки в конце
+\f перевод страницы
+\n новая строка
+\r возврат каретки
+\t горизонтальаня табуляция
+\v вертикальаня табуляция
+*/

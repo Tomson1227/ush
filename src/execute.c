@@ -79,7 +79,7 @@ void execute(t_main *interface) // REV 1.02
         /*    print result of the last function    */
         if(interface->result.value) {
             mx_print_strarr(interface->result.value, " ");
-            mx_printchar('\n');
+            // mx_printchar('\n');
             mx_del_strarr(&interface->result.value);
         }
 
