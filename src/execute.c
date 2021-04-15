@@ -67,7 +67,7 @@ void execute(t_main *interface) // REV 1.02
         "cd",
         "pwd",
         "which",
-        "echo",
+        "echo", 
         "fg",
         NULL
     };
