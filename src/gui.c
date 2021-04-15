@@ -8,6 +8,11 @@ char **get_args(char **args, uint8_t *index)
     uint8_t count_args;
     char **select_args = NULL;
 
+    int i = 0;
+    while(args[i] != NULL) {
+        printf("%s\n", args[i++]);
+    }
+
     for(count_args = 0; args[(*index) + count_args]; ++count_args) {
         if(!mx_strcmp(args[(*index) + count_args], ";"))
             break;
