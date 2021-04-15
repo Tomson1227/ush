@@ -2,26 +2,21 @@
 
 void pwd_func(t_main *interface)
 {
-
     long path_max;
     size_t size;
     char *ptr;
 
     path_max = pathconf(".", _PC_PATH_MAX);
-    if (path_max == -1)
-        size = 1024;
-    else if (path_max > 10240)
-        size = 10240;
-    else
-        size = path_max;
+    size = (path_max == -1) ? 1024 : 
+           (path_max > 10240) ? 10240 : path_max;
 
-
-    for (interface->result = ptr = NULL; ptr == NULL; size *= 2)
+    for (interface->result.value[0] = ptr = NULL; ptr == NULL; size *= 2)
     {
-        if ((interface->result = realloc(interface->result, size)) == NULL)
+        if ((interface->result.value = realloc(interface->result.value, size)) == NULL)
             strerror(errno);
 
-        ptr = getcwd(interface->result, size);
+        ptr = getcwd(interface->result.value[0], size);
+ 
         if (ptr == NULL && errno != ERANGE)
             strerror(errno);
     }

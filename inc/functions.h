@@ -11,5 +11,6 @@ t_main *new_struct_t_main(void);
 
 void pwd_func(t_main *interface);
 void cd_func(t_main *interface);
+void echo_func(t_main *interface);
 
 #endif /* FUNCTION_H */

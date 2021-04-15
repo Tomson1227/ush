@@ -7,12 +7,7 @@ void fg_func(t_main *interface)
 
 void exit_func(t_main *interface)
 {
-<<<<<<< HEAD
     interface->status = 0;
-=======
-    mx_print_strarr(interface->command_args, " ");
-    return 0;
->>>>>>> 9cf39806e53290b469830eb1e9b1d914d730aa6e
 }
 
 void unset_func(t_main *interface)
@@ -31,11 +26,6 @@ void env_func(t_main *interface)
 }
 
 void which_func(t_main *interface)
-{
-    interface->status = 1;
-}
-
-void echo_func(t_main *interface)
 {
     interface->status = 1;
 }
@@ -73,9 +63,8 @@ void execute(t_main *interface) // REV 1.02
         "pwd",      //5
         "whitch",   //6
         "echo",     //7
-        "pwd",      //8
-        "fg",       //9
-        NULL        //10
+        "fg",       //8
+        NULL        //9
     };
 
     for(uint8_t index = 0; interface->line_arg.value[index] && interface->status;) {
@@ -88,10 +77,10 @@ void execute(t_main *interface) // REV 1.02
         builtin_func[i](interface);
 
         /*    print result of the last function    */
-        if(interface->result) {
-            mx_printstr(interface->result);
+        if(interface->result.value) {
+            mx_print_strarr(interface->result.value, " ");
             mx_printchar('\n');
-            mx_strdel(&interface->result);
+            mx_del_strarr(&interface->result.value);
         }
 
         free(interface->func_arg.value);
