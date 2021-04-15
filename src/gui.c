@@ -4,8 +4,15 @@ void get_func_arg(t_main *interface, uint8_t *index)
 {
     uint8_t count_args;
 
+    //if(interface->triggers.pipe != false)
+        
+
     for(count_args = 0; interface->line_arg.value[(*index) + count_args]; ++count_args) {
-        if(!mx_strcmp(interface->line_arg.value[(*index) + count_args], ";"))
+        if(!mx_strcmp(interface->line_arg.value[(*index) + count_args], "|")) {
+            interface->triggers.pipe = true;
+            break;
+        }
+        else if(!mx_strcmp(interface->line_arg.value[(*index) + count_args], ";"))
             break;
     }
     

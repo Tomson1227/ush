@@ -11,21 +11,16 @@ typedef struct s_args {
     char **value;
 }              t_args;
 
-// enum e_instruct {
-//     pipe = (uint8_t) 0x0001U
-// };
-
-
-// typedef struct s_instruction {
-//     uint8_t op_flag;
-// }              t_instruction;
-
+typedef struct s_triggers {
+    bool pipe; // '|'
+}              t_triggers;     
 
     /* main struct */
 typedef struct s_main {
     t_args func_arg;
     t_args line_arg;
     t_args result;
+    t_triggers triggers;
     volatile int status;
     t_ush ush;
 }              t_main;
