@@ -11,10 +11,15 @@ typedef struct s_args {
     char **value;
 }              t_args;
 
+typedef struct s_triggers {
+    bool pipe; // '|'
+}              t_triggers;     
+
     /* main struct */
 typedef struct s_main {
     t_args func_arg;
     t_args line_arg;
+    t_triggers triggers;
     t_ush ush;
     volatile int status;
     char *result;

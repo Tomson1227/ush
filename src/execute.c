@@ -7,12 +7,7 @@ void fg_func(t_main *interface)
 
 void exit_func(t_main *interface)
 {
-<<<<<<< HEAD
     interface->status = 0;
-=======
-    mx_print_strarr(interface->command_args, " ");
-    return 0;
->>>>>>> 9cf39806e53290b469830eb1e9b1d914d730aa6e
 }
 
 void unset_func(t_main *interface)
@@ -73,7 +68,6 @@ void execute(t_main *interface) // REV 1.02
         "pwd",      //5
         "whitch",   //6
         "echo",     //7
-        "pwd",      //8
         "fg",       //9
         NULL        //10
     };
