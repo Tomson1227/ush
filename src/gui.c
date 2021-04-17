@@ -14,16 +14,15 @@ void get_func_arg(t_main *interface, uint8_t *index)
         else if(!mx_strcmp(interface->line_arg.value[(*index) + count_args], ";"))
             break;
     }
-    
-    interface->func_arg.value = (char **) calloc(count_args + 1, sizeof(char *));
-    
-    if(!interface->func_arg.value)
-        mx_print_error("allocation fail");
-        
-    for(uint8_t i = 0; i < count_args;) {
-        interface->func_arg.value[i++] = interface->line_arg.value[(*index)++];
-        interface->func_arg.value[i] = NULL;
+
+    calloc_args(&interface->func_arg, count_args + 1);
+
+    for(uint8_t i = 0; i < count_args; ++i) {
+        write_arg(&interface->func_arg, interface->line_arg.value[(*index)++]);
     }
 
-    interface->func_arg.number = count_args;
+    // for(uint8_t i = 0; i < count_args;) {
+    //     interface->func_arg.value[i++] = interface->line_arg.value[(*index)++];
+    //     interface->func_arg.value[i] = NULL;
+    // }
 }

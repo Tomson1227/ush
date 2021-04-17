@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "functions.h"
 #include "macros.h"

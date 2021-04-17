@@ -3,14 +3,23 @@
 
 #include "struct.h"
 
+void print_args(t_main *interface);
 void start_gui(void);
-char *read_line(void);
+void read_line(t_main *interface);
 void execute(t_main *interface);
 void get_func_arg(t_main *interface, uint8_t *index);
-t_main *new_struct_t_main(void);
+void add_newline(char **str);
 
 void pwd_func(t_main *interface);
 void cd_func(t_main *interface);
 void echo_func(t_main *interface);
+
+void calloc_args(t_args *args, uint16_t n);
+void realloc_args(t_args *args, uint16_t added_pos);
+void write_arg(t_args *args, char *argv);
+void init_main_struct(t_main **interface);
+void clean_args_struct(t_args *args);
+void copy_args(t_args *args_dest, t_args *args_src);
+void ncopy_args(t_args *args_dest, t_args *args_src, uint16_t n);
 
 #endif /* FUNCTION_H */

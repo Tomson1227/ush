@@ -69,23 +69,14 @@ void execute(t_main *interface) // REV 1.02
 
     for(uint8_t index = 0; interface->line_arg.value[index] && interface->status;) {
         uint8_t i = 0;
-
         get_func_arg(interface, &index);
-        
+
         for(; commands[i] && mx_strcmp(interface->func_arg.value[0], commands[i]); ++i);
         
         builtin_func[i](interface);
-
+        clean_args_struct(&interface->func_arg);
+        
         /*    print result of the last function    */
-        if(interface->result.value) {
-            mx_print_strarr(interface->result.value, " ");
-            // mx_printchar('\n');
-            mx_del_strarr(&interface->result.value);
-        }
-
-        free(interface->func_arg.value);
-        interface->func_arg.value = NULL;
+        print_args(interface);
     }
-    
-    free(interface->line_arg.value);
 }
