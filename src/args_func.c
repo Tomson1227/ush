@@ -35,7 +35,7 @@ void write_arg(t_args *args, char *argv)
 
 void copy_args(t_args *args_dest, t_args *args_src)
 {
-    realloc_args(args_dest, args_src->number);
+    realloc_args(args_dest, args_src->number + args_src->number);
 
     for(uint16_t index = 0; args_src->value[index]; ++index) {
         write_arg(args_dest, args_src->value[index]);
@@ -44,7 +44,7 @@ void copy_args(t_args *args_dest, t_args *args_src)
 
 void ncopy_args(t_args *args_dest, t_args *args_src, uint16_t n)
 {
-    realloc_args(args_dest, n);
+    realloc_args(args_dest, args_dest->number + n);
 
     for(uint16_t index = 0; index < n; ++index) {
         write_arg(args_dest, args_src->value[index]);

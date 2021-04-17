@@ -2,6 +2,7 @@
 #define MACROS_H
 
 #define BOLD                "\033[1m"
+
 //Color set
 #define BLACK               "\033[30m"
 #define RED                 "\033[31m"
@@ -22,5 +23,15 @@
 #define CYAN_BG             "\033[46m"
 #define LIGHT_GRAY_BG       "\033[47m"
 #define DEFAULT_COLLOR_BG   "\033[49m"
+
+#define cursorforward(x) printf("\033[%dC", (x))
+#define cursorbackward(x) printf("\033[%dD", (x))
+
+#define KEY_ESCAPE  0x001b
+#define KEY_ENTER   0x000a
+#define KEY_UP      0x0105
+#define KEY_DOWN    0x0106
+#define KEY_LEFT    0x0107
+#define KEY_RIGHT   0x0108
 
 #endif /* MACROS_H */
