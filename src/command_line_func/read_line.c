@@ -1,37 +1,10 @@
 #include "ush.h"
 
-static struct termios term, oterm;
-
-static int getch(void);
-static int kbhit(void);
-static int kbesc(void);
-static int kbget(void);
-
-typedef struct s_line {
-    char *prompt;
-    char *line;
-    size_t size;
-    size_t position;
-    int symbol;
-}              t_line;
-
 static void split_line(t_main *interface, char *line)
 {
     char *clean_line = mx_del_extra_spaces(line);
     interface->line_arg.number = mx_count_words(clean_line, ' ');
     interface->line_arg.value = mx_strsplit(clean_line, ' ');
-}
-
-static inline void init_line_struct(t_line *line)
-{
-    size_t prompt_size = snprintf(NULL, 0, "%s%sU$H>%s ", BOLD, GREEN, DEFAULT_COLLOR);
-    line->prompt = (char *) calloc(prompt_size, sizeof(char));
-    sprintf(line->prompt, "%s%sU$H>%s ", BOLD, GREEN, DEFAULT_COLLOR);
-
-    line->line = (char *) calloc(BUFSIZE, sizeof(char));
-    line->size = 0;
-    line->position = 0;
-    line->symbol = '\0';
 }
 
 static void reset_line(t_line *line)
@@ -79,45 +52,45 @@ static void remove_char(t_line *line)
     reset_line(line);  
 } 
 
-static int getch(void)
+static int getch(t_line *line)
 {
     int c = 0;
 
-    tcgetattr(0, &oterm);
-    memcpy(&term, &oterm, sizeof(term));
-    term.c_lflag &= ~(ICANON | ECHO);
-    term.c_cc[VMIN] = 1;
-    term.c_cc[VTIME] = 0;
-    tcsetattr(0, TCSANOW, &term);
+    tcgetattr(0, &line->oterm);
+    memcpy(&line->term, &line->oterm, sizeof(line->term));
+    line->term.c_lflag &= ~(ICANON | ECHO);
+    line->term.c_cc[VMIN] = 1;
+    line->term.c_cc[VTIME] = 0;
+    tcsetattr(0, TCSANOW, &line->term);
     c = getchar();
-    tcsetattr(0, TCSANOW, &oterm);
+    tcsetattr(0, TCSANOW, &line->oterm);
     return c;
 }
 
-static int kbhit(void)
+static int kbhit(t_line *line)
 {
     int c = 0;
 
-    tcgetattr(0, &oterm);
-    memcpy(&term, &oterm, sizeof(term));
-    term.c_lflag &= ~(ICANON | ECHO);
-    term.c_cc[VMIN] = 0;
-    term.c_cc[VTIME] = 1;
-    tcsetattr(0, TCSANOW, &term);
+    tcgetattr(0, &line->oterm);
+    memcpy(&line->term, &line->oterm, sizeof(line->term));
+    line->term.c_lflag &= ~(ICANON | ECHO);
+    line->term.c_cc[VMIN] = 0;
+    line->term.c_cc[VTIME] = 1;
+    tcsetattr(0, TCSANOW, &line->term);
     c = getchar();
-    tcsetattr(0, TCSANOW, &oterm);
+    tcsetattr(0, TCSANOW, &line->oterm);
     if (c != -1) ungetc(c, stdin);
     return ((c != -1) ? 1 : 0);
 }
 
-static int kbesc(void)
+static int kbesc(t_line *line)
 {
     int c;
 
-    if (!kbhit()) return KEY_ESCAPE;
-    c = getch();
+    if (!kbhit(line)) return KEY_ESCAPE;
+    c = getch(line);
     if (c == '[') {
-        switch (getch()) {
+        switch (getch(line)) {
             case 'A':
                 c = KEY_UP;
                 break;
@@ -137,27 +110,33 @@ static int kbesc(void)
     } else {
         c = 0;
     }
-    if (c == 0) while (kbhit()) getch();
+    if (c == 0) while (kbhit(line)) getch(line);
     return c;
 }
 
-static int kbget(void)
+static int kbget(t_line *line)
 {
     int c;
 
-    c = getch();
-    return (c == KEY_ESCAPE) ? kbesc() : c;
+    c = getch(line);
+    return (c == KEY_ESCAPE) ? kbesc(line) : c;
 }
 
 void read_line(t_main *interface)
 {
+    // printf("Debug P1\n");
     t_line *line = (t_line *) calloc(1, sizeof(t_line));
+    // printf("Debug P2\n");
     init_line_struct(line);
-    // write(STDOUT_FILENO, line->prompt, mx_strlen(line->prompt));
+    line->prompt = interface->prompt;
+    // printf("Debug P3\n");
+    new_command(&interface->command);
+    // printf("Debug P4\n");
     reset_line(line);
+    // printf("Debug P5\n");
     
     while (1) {
-        line->symbol = kbget();
+        line->symbol = kbget(line);
         if (line->symbol == KEY_ENTER || line->symbol == KEY_ESCAPE || line->symbol == KEY_UP || line->symbol == KEY_DOWN) {
             break;
         } 
@@ -186,6 +165,14 @@ void read_line(t_main *interface)
         }
     }
 
+
     write(STDOUT_FILENO, &"\n", 1);
+    printf("Debug 1\n");
+     printf("&interface->command pos = %p\n", (void *) &interface->command);
+    printf("interface->command pos = %p\n", (void *) interface->command);
+    dup_command(interface->command, line->line);
+    printf("Debug 2\n");
     split_line(interface, line->line);    
+    printf("Debug 3\n");
+    clear_line_struct(&line);
 }

@@ -6,16 +6,14 @@ int main(int argn, char *argv[])
 {
     t_main *interface = NULL;
     init_main_struct(&interface);
-    // set_keypress();
 
     while (interface->status) {
-        mx_printstr(interface->ush.ush_name);
+        printf("TP1\n");
         read_line(interface);
+        printf("TP2\n");
         execute(interface);
         clean_args_struct(&interface->line_arg);
     }
-    
-    // reset_keypress();
 
     return EXIT_SUCCESS;
 }

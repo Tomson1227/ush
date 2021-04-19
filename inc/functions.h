@@ -22,6 +22,14 @@ void clean_args_struct(t_args *args);
 void copy_args(t_args *args_dest, t_args *args_src);
 void ncopy_args(t_args *args_dest, t_args *args_src, uint16_t n);
 
+void init_line_struct(t_line *line);
+void clear_line_struct(t_line **line);
+void new_command(t_command_list **head);
+void del_last_command(t_command_list **head);
+void del_command_list(t_command_list **head);
+void set_command(t_command_list **head, char *command);
+void dup_command(t_command_list *head, char *command);
+
 void set_keypress(void);
 void reset_keypress(void);
 

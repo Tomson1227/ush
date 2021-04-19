@@ -3,10 +3,6 @@
 
 typedef struct s_main t_main;
 
-typedef struct s_ush {
-    char *ush_name;
-}              t_ush;
-
 typedef struct s_args {
     int number;
     char **value;
@@ -16,22 +12,31 @@ typedef struct s_triggers {
     bool pipe; // '|'
 }              t_triggers;     
 
-typedef struct s_func {
-    void (*print_args) (t_main *);
-    void (*write_arg) (t_args *, char *);
-    void (*copy_args) (t_args *, t_args *);
-    void (*ncopy_args) (t_args *, t_args *, uint16_t);
-}              t_func;
+typedef struct s_command_list {
+    char *command;
+    struct s_command_list *next_command;
+    struct s_command_list *prev_command;
+}              t_command_list;
 
     /* main struct */
 struct s_main {
     t_args line_arg;
     t_args func_arg;
     t_args result;
-    t_func func;
     t_triggers triggers;
     volatile int status;
-    t_ush ush;
+    char *prompt;
+    t_command_list *command;
 };
+
+typedef struct s_line {
+    char *prompt;
+    char *line;
+    size_t size;
+    size_t position;
+    int symbol;
+    struct termios term;
+    struct termios oterm;
+}              t_line;
 
 #endif /* All struct */
