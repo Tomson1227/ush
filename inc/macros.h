@@ -24,6 +24,7 @@
 #define LIGHT_GRAY_BG       "\033[47m"
 #define DEFAULT_COLLOR_BG   "\033[49m"
 
+
 #define cursorforward(x) printf("\033[%dC", (x))
 #define cursorbackward(x) printf("\033[%dD", (x))
 
@@ -33,5 +34,8 @@
 #define KEY_DOWN    0x0106
 #define KEY_LEFT    0x0107
 #define KEY_RIGHT   0x0108
+#define KEY_DEL     0x007F
+
+#define BUFSIZE     1024
 
 #endif /* MACROS_H */

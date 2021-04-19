@@ -4,7 +4,11 @@ SRC_DIR		= src/
 OBJ_DIR		= obj/
 INC_DIR		= inc/
 
-SRC			= $(wildcard $(SRC_DIR)*.c)
+
+SRC_DIRS	= $(notdir $(wildcard $(SRC_DIR)*))
+SRC_PATH	= $(foreach dirs, $(SRC_DIRS), $(SRC_DIR)$(dirs))
+SRC			= $(foreach path, $(SRC_PATH), $(wildcard $(path)/*.c))
+#SRC			= $(wildcard $(SRC_PATH)*.c)
 OBJ			= $(SRC:src/%.c=$(OBJ_DIR)%.o)
 INC_H		= $(wildcard $(INC_DIR)*.h)
 
@@ -38,7 +42,7 @@ $(LIB_LIST): $(LIB_DIRS)
 	@$(MAKE_M) $(LIB_DIR)/$@
 
 $(OBJ_DIR):
-	@mkdir -p $@ $(foreach dir, $(DIRS), $@/$(dir))
+	@mkdir -p $@ $(foreach dir, $(SRC_DIRS), $@/$(dir))
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c $(INC_H) $(LIB_BIN)
 	@$(COMPILE) -L./libmx -lmx -o $@ -c $<

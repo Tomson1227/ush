@@ -25,5 +25,4 @@ void ncopy_args(t_args *args_dest, t_args *args_src, uint16_t n);
 void set_keypress(void);
 void reset_keypress(void);
 
-
 #endif /* FUNCTION_H */

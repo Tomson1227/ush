@@ -2,6 +2,7 @@
 #define USH_H
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <errno.h>
@@ -9,6 +10,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <termios.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "functions.h"
 #include "macros.h"
