@@ -1,20 +1,25 @@
 #include "ush.h"
 
-static void split_line(t_main *interface, char *line)
+static void line_close(t_line **line, t_main *interface)
 {
-    char *clean_line = mx_del_extra_spaces(line);
+    dup_command(interface->command, (*line)->line);
+    char *clean_line = mx_del_extra_spaces((*line));
     interface->line_arg.number = mx_count_words(clean_line, ' ');
-    interface->line_arg.value = mx_strsplit(clean_line, ' ');
+    interface->line_arg.value = mx_strsplit(clean_line, ' ');  
+    clear_line_struct(line);
 }
 
 static void reset_line(t_line *line)
 {    
     write(STDOUT_FILENO, "\r", 1);
+    
     for(uint32_t i = 0; i < line->size + mx_strlen(line->prompt); ++i)
         write(STDOUT_FILENO, &" ", 1);
+        
     write(STDOUT_FILENO, "\r", 1);
     write(STDOUT_FILENO, line->prompt, mx_strlen(line->prompt));
     write(STDOUT_FILENO, (void *) line->line, line->size);
+
     if(line->size != line->position)
         cursorbackward((int) (line->size - line->position));
 }
@@ -124,21 +129,35 @@ static int kbget(t_line *line)
 
 void read_line(t_main *interface)
 {
-    // printf("Debug P1\n");
     t_line *line = (t_line *) calloc(1, sizeof(t_line));
-    // printf("Debug P2\n");
     init_line_struct(line);
-    line->prompt = interface->prompt;
-    // printf("Debug P3\n");
     new_command(&interface->command);
-    // printf("Debug P4\n");
+    line->prompt = interface->prompt;
+    line->last_commant = interface->command;
     reset_line(line);
-    // printf("Debug P5\n");
     
     while (1) {
         line->symbol = kbget(line);
-        if (line->symbol == KEY_ENTER || line->symbol == KEY_ESCAPE || line->symbol == KEY_UP || line->symbol == KEY_DOWN) {
+        if (line->symbol == KEY_ENTER || line->symbol == KEY_ESCAPE) {
             break;
+        } 
+        else if (line->symbol == KEY_UP) {
+            if((void *) line->last_commant->next_command) {
+                if(line->last_commant == interface->command)
+                    interface->command->command = mx_strdup(line->line);
+                line->last_commant = line->last_commant->next_command;
+                mx_strcpy(line->line, line->last_commant->command);
+                line->position = line->size = mx_strlen(line->line);
+                reset_line(line);
+            }
+        }         
+        else if (line->symbol == KEY_DOWN) {
+            if((void *) line->last_commant->prev_command) {
+                line->last_commant = line->last_commant->prev_command;
+                mx_strcpy(line->line, line->last_commant->command);
+                line->position = line->size = mx_strlen(line->line);
+                reset_line(line);
+            }
         } 
         else if (line->symbol == KEY_RIGHT) {
             if(line->position < line->size) {
@@ -165,14 +184,6 @@ void read_line(t_main *interface)
         }
     }
 
-
     write(STDOUT_FILENO, &"\n", 1);
-    printf("Debug 1\n");
-     printf("&interface->command pos = %p\n", (void *) &interface->command);
-    printf("interface->command pos = %p\n", (void *) interface->command);
-    dup_command(interface->command, line->line);
-    printf("Debug 2\n");
-    split_line(interface, line->line);    
-    printf("Debug 3\n");
-    clear_line_struct(&line);
+    line_close(&line,interface);
 }

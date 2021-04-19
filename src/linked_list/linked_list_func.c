@@ -14,13 +14,13 @@ static t_command_list *init_command(void)
     return new_node;
 }
 
-void set_command(t_command_list **head, char *command)
+void set_command(t_command_list *head, char *command)
 {
-    if((*head)->command) {
-        free((*head)->command);
+    if(malloc_size(head->command)) {
+        free(head->command);
     }
 
-    (*head)->command = command;
+    head->command = command;
 }
 
 void dup_command(t_command_list *head, char *command)
@@ -36,14 +36,14 @@ void new_command(t_command_list **head)
 {
     t_command_list *new_command = init_command();
     
-    if(!*head) {
-        head = &new_command;        
+    if(!(*head)) {
+        (*head) = new_command;        
         return;
     }
 
     new_command->next_command = *head;
     (*head)->prev_command = new_command;
-    head = &new_command;
+    (*head) = new_command;
 }
 
 void del_last_command(t_command_list **head)

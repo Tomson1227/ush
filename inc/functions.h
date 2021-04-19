@@ -27,7 +27,7 @@ void clear_line_struct(t_line **line);
 void new_command(t_command_list **head);
 void del_last_command(t_command_list **head);
 void del_command_list(t_command_list **head);
-void set_command(t_command_list **head, char *command);
+void set_command(t_command_list *head, char *command);
 void dup_command(t_command_list *head, char *command);
 
 void set_keypress(void);

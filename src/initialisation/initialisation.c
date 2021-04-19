@@ -34,6 +34,7 @@ void init_line_struct(t_line *line)
     line->size = 0;
     line->position = 0;
     line->symbol = '\0';
+    line->last_commant = NULL;
 }
 
 void clear_line_struct(t_line **line)
@@ -43,6 +44,7 @@ void clear_line_struct(t_line **line)
     (*line)->size = 0;
     (*line)->position = 0;
     (*line)->symbol = '\0';
-    free(line);
-    line = NULL;
+    (*line)->last_commant = NULL;
+    free(*line);
+    *line = NULL;
 }

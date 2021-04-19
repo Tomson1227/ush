@@ -30,6 +30,7 @@ struct s_main {
 };
 
 typedef struct s_line {
+    t_command_list *last_commant;
     char *prompt;
     char *line;
     size_t size;
