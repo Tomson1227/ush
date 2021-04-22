@@ -3,7 +3,7 @@
 static void line_close(t_line **line, t_main *interface)
 {
     dup_command(interface->command, (*line)->line);
-    char *clean_line = mx_del_extra_spaces((*line));
+    char *clean_line = mx_del_extra_spaces((*line)->line);
     interface->line_arg.number = mx_count_words(clean_line, ' ');
     interface->line_arg.value = mx_strsplit(clean_line, ' ');  
     clear_line_struct(line);
@@ -30,7 +30,7 @@ static void add_char(t_line *line)
         line->line[line->position++] = line->symbol;
         line->line[line->position] = '\0';
     }
-    else {
+    else {  
         for(size_t i = line->size; i >= line->position; --i) {
             line->line[i + 1] = line->line[i];
             
@@ -133,7 +133,7 @@ void read_line(t_main *interface)
     init_line_struct(line);
     new_command(&interface->command);
     line->prompt = interface->prompt;
-    line->last_commant = interface->command;
+    line->last_command = interface->command;
     reset_line(line);
     
     while (1) {
@@ -142,19 +142,19 @@ void read_line(t_main *interface)
             break;
         } 
         else if (line->symbol == KEY_UP) {
-            if((void *) line->last_commant->next_command) {
-                if(line->last_commant == interface->command)
+            if((void *) line->last_command->next_command) {
+                if(line->last_command == interface->command)
                     interface->command->command = mx_strdup(line->line);
-                line->last_commant = line->last_commant->next_command;
-                mx_strcpy(line->line, line->last_commant->command);
+                line->last_command = line->last_command->next_command;
+                mx_strcpy(line->line, line->last_command->command);
                 line->position = line->size = mx_strlen(line->line);
                 reset_line(line);
             }
         }         
         else if (line->symbol == KEY_DOWN) {
-            if((void *) line->last_commant->prev_command) {
-                line->last_commant = line->last_commant->prev_command;
-                mx_strcpy(line->line, line->last_commant->command);
+            if((void *) line->last_command->prev_command) {
+                line->last_command = line->last_command->prev_command;
+                mx_strcpy(line->line, line->last_command->command);
                 line->position = line->size = mx_strlen(line->line);
                 reset_line(line);
             }

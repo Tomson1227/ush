@@ -12,6 +12,7 @@
 #include <termios.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <dirent.h>
 
 #include "functions.h"
 #include "macros.h"
