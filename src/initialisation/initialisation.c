@@ -32,20 +32,15 @@ void init_line_struct(t_line *line, t_main *interface)
 {
     tcgetattr(0, &line->term);
     memcpy(&line->oterm1, &line->term, sizeof(struct termios));
-    memcpy(&line->oterm2, &line->term, sizeof(struct termios));
     line->oterm1.c_lflag &= ~(ICANON | ECHO); //ISIG
     line->oterm1.c_cc[VMIN] = 1;
     line->oterm1.c_cc[VTIME] = 0;
-
-    line->oterm2.c_lflag &= ~(ICANON | ECHO);
-    line->oterm2.c_cc[VMIN] = 0;
-    line->oterm2.c_cc[VTIME] = 1;
 
     line->line = (char *) calloc(BUFSIZE, sizeof(char));
     line->size = 0;
     line->position = 0;
     line->symbol = '\0';
-    line->last_commant = interface->command;
+    line->last_command = interface->command;
     line->key_press = (char *) calloc(10, sizeof(char));
 }
 
@@ -56,7 +51,7 @@ void clear_line_struct(t_line **line)
     (*line)->size = 0;
     (*line)->position = 0;
     (*line)->symbol = '\0';
-    (*line)->last_commant = NULL;
+    (*line)->last_command = NULL;
     free(*line);
     *line = NULL;
 }

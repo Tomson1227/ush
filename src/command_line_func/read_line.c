@@ -50,7 +50,7 @@ static void add_char(t_line *line)
         line->line[line->position++] = line->symbol;
         line->line[line->position] = '\0';
     }
-    else {
+    else {  
         for(size_t i = line->size; i >= line->position; --i) {
             line->line[i + 1] = line->line[i];
             
@@ -95,11 +95,11 @@ static void remove_char_right(t_line *line)
 
 static void key_up(t_line *line, t_main *interface) 
 {
-    if((void *) line->last_commant->next_command) {
-        if(line->last_commant == interface->command)
+    if((void *) line->last_command->next_command) {
+        if(line->last_command == interface->command)
             interface->command->command = mx_strdup(line->line);
-        line->last_commant = line->last_commant->next_command;
-        mx_strcpy(line->line, line->last_commant->command);
+        line->last_command = line->last_command->next_command;
+        mx_strcpy(line->line, line->last_command->command);
         line->position = line->size = mx_strlen(line->line);
         reset_line(line);
     }
@@ -107,9 +107,9 @@ static void key_up(t_line *line, t_main *interface)
 
 static void key_down(t_line *line, t_main *interface) 
 { 
-    if((void *) line->last_commant->prev_command) {
-        line->last_commant = line->last_commant->prev_command;
-        mx_strcpy(line->line, line->last_commant->command);
+    if((void *) line->last_command->prev_command) {
+        line->last_command = line->last_command->prev_command;
+        mx_strcpy(line->line, line->last_command->command);
         line->position = line->size = mx_strlen(line->line);
         reset_line(line);
     }
