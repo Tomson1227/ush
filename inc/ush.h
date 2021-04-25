@@ -17,6 +17,7 @@
 #include "macros.h"
 #include "libmx.h"
 #include "struct.h"
+#include "keydef.h"
 
 extern struct termios stored_settings;
 

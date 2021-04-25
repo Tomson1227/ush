@@ -23,18 +23,30 @@ void init_main_struct(t_main **interface)
     init_triggers_struct(&(*interface)->triggers);
     (*interface)->command = NULL;
 
-    size_t prompt_size = snprintf(NULL, 0, "%s%sU$H>%s ", BOLD, GREEN, DEFAULT_COLLOR);
+    size_t prompt_size = snprintf(NULL, 0, "%s%sU$H>%s ", BOLD, FG_COLOR_GREEN, RESET_ALL);
     (*interface)->prompt = (char *) calloc(prompt_size, sizeof(char));
-    sprintf((*interface)->prompt, "%s%sU$H>%s ", BOLD, GREEN, DEFAULT_COLLOR);
+    sprintf((*interface)->prompt, "%s%sU$H>%s ", BOLD, FG_COLOR_GREEN, RESET_ALL);
 }
 
-void init_line_struct(t_line *line)
+void init_line_struct(t_line *line, t_main *interface)
 {
+    tcgetattr(0, &line->term);
+    memcpy(&line->oterm1, &line->term, sizeof(struct termios));
+    memcpy(&line->oterm2, &line->term, sizeof(struct termios));
+    line->oterm1.c_lflag &= ~(ICANON | ECHO); //ISIG
+    line->oterm1.c_cc[VMIN] = 1;
+    line->oterm1.c_cc[VTIME] = 0;
+
+    line->oterm2.c_lflag &= ~(ICANON | ECHO);
+    line->oterm2.c_cc[VMIN] = 0;
+    line->oterm2.c_cc[VTIME] = 1;
+
     line->line = (char *) calloc(BUFSIZE, sizeof(char));
     line->size = 0;
     line->position = 0;
     line->symbol = '\0';
-    line->last_commant = NULL;
+    line->last_commant = interface->command;
+    line->key_press = (char *) calloc(10, sizeof(char));
 }
 
 void clear_line_struct(t_line **line)

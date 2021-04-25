@@ -22,7 +22,7 @@ void clean_args_struct(t_args *args);
 void copy_args(t_args *args_dest, t_args *args_src);
 void ncopy_args(t_args *args_dest, t_args *args_src, uint16_t n);
 
-void init_line_struct(t_line *line);
+void init_line_struct(t_line *line, t_main *interface);
 void clear_line_struct(t_line **line);
 void new_command(t_command_list **head);
 void del_last_command(t_command_list **head);

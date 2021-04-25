@@ -31,13 +31,14 @@ struct s_main {
 
 typedef struct s_line {
     t_command_list *last_commant;
-    char *prompt;
     char *line;
+    char *key_press;
     size_t size;
     size_t position;
     int symbol;
     struct termios term;
-    struct termios oterm;
+    struct termios oterm1;
+    struct termios oterm2;
 }              t_line;
 
 #endif /* All struct */
