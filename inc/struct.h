@@ -36,6 +36,8 @@ typedef struct s_line {
     size_t size;
     size_t position;
     int symbol;
+    bool tab;
+    char **tab_var;
     struct termios term;
     struct termios oterm1;
     struct termios oterm2;

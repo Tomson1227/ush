@@ -7,7 +7,7 @@
 #define KEY_NEW_LINE    0x0A
 #define KEY_ESCAPE      0x1B
 #define KEY_CTRL_SEQ    0x5E
-
+#define KEY_TAB         0x09
 
 #define ESC                 "\033"
 

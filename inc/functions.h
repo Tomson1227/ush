@@ -33,4 +33,6 @@ void dup_command(t_command_list *head, char *command);
 void set_keypress(void);
 void reset_keypress(void);
 
+void auto_completion(t_line *line);
+
 #endif /* FUNCTION_H */

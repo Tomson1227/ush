@@ -38,6 +38,7 @@ void init_line_struct(t_line *line, t_main *interface)
 
     line->line = (char *) calloc(BUFSIZE, sizeof(char));
     line->size = 0;
+    line->tab = false;
     line->position = 0;
     line->symbol = '\0';
     line->last_command = interface->command;

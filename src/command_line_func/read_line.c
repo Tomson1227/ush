@@ -17,9 +17,17 @@ static void reset_line(t_line *line)
     // mx_printstr("line position = ");
     // mx_printint(line->position);
     // mx_printchar('\n');
+
+    if(line->tab) {
+        mx_printchar('\n');
+        line->tab = false;
+        mx_print_strarr(line->tab_var, "\t");
+    }
+
     mx_printstr(RESTORE_CURSOR_POS);
     if(line->position)
         CURSOR_N_RIGHT((uint32_t)(line->position));
+
 }
 
 static void get_key_press(t_line *line)
@@ -30,7 +38,7 @@ static void get_key_press(t_line *line)
         line->key_press[index] = '\0';
         
     tcsetattr(0, TCSANOW, &line->oterm1);
-    read(STDIN_FILENO,line->key_press, 10);
+    read(STDIN_FILENO,line->key_press, 10); 
 
     // for(uint8_t index = 0; line->key_press[index]; ++index) {
     //     if(line->key_press[index] == KEY_ESCAPE)
@@ -275,14 +283,23 @@ static uint8_t process_key_press(t_line *line, t_main *interface)
 
     //general character
     if(line->key_press[0] == KEY_ESCAPE) {
-        return escape_sequenses(line, interface);
+        escape_sequenses(line, interface);
     }
     else if(line->key_press[0] == KEY_CTRL_SEQ) {
-        return ctrl_sequenses(line, interface);
+        ctrl_sequenses(line, interface);
     }
     else if(line->key_press[0] == KEY_BACKSPASE) {
         remove_char_left(line);
-        return 1;
+    }
+    else if(line->key_press[0] == KEY_TAB) {
+        if(!line->tab) {
+            line->tab = true;
+            auto_completion(line);
+            reset_line(line);
+        }
+        else {
+            // change_var(line);
+        }
     }
     else if(line->key_press[0] == KEY_NEW_LINE) {
         return 0;
@@ -290,8 +307,10 @@ static uint8_t process_key_press(t_line *line, t_main *interface)
     else {
         line->symbol = line->key_press[0];
         add_char(line);
-        return 1;
+        line->tab = false;
     }
+
+    return 1;
 }
 
 void read_line(t_main *interface)
