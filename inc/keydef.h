@@ -82,9 +82,9 @@
 
 #define MV_CURSOR(row,column)       mx_printstr(CSI), \
                                     mx_printint(row), \
-                                    mx_printchar(':'), \
+                                    mx_printchar(';'), \
                                     mx_printint(column), \
-                                    mx_printchar('H')
+                                    mx_printchar('f')
 
 /*    Terminal input sequences    */
 #define INSERT_KEY          CSI "2~"
@@ -140,14 +140,31 @@
 #define ERASE_RIGHT         mx_printstr(CSI "0K")
 #define ERASE_LEFT          mx_printstr(CSI "1K")
 #define ERASE_LINE          mx_printstr(CSI "2K")
+#define ERASE_DOWN          mx_printstr(CSI "0J")
+#define ERASE_UP            mx_printstr(CSI "1J")
+#define ERASE_ALL           mx_printstr(CSI "2J")
+#define SCROLL_UP           mx_printstr(CSI "1S")
+#define SCROLL_DOWN         mx_printstr(CSI "1T")
+
 #define CURSUR_RIGHT        mx_printstr(CSI "1C")
 #define CURSUR_LEFT         mx_printstr(CSI "1D")
+#define CURSOR_UP           mx_printstr(CSI "1A")
+#define CURSOR_DOWN         mx_printstr(CSI "1B")
 
-#define CURSOR_N_LEFT(x)    mx_printstr(CSI),   \
+#define GET_CURSOR          mx_printstr(CSI "6n")
+
+#define CURSOR_N_UP(x)      mx_printstr(CSI),   \
                             mx_printint(x),     \
-                            mx_printchar('D')
+                            mx_printchar('A')
+#define CURSOR_N_DOWN(x)    mx_printstr(CSI),   \
+                            mx_printint(x),     \
+                            mx_printchar('B')
 #define CURSOR_N_RIGHT(x)   mx_printstr(CSI),   \
                             mx_printint(x),     \
                             mx_printchar('C')
+#define CURSOR_N_LEFT(x)    mx_printstr(CSI),   \
+                            mx_printint(x),     \
+                            mx_printchar('D')
+
 
 #endif /* KEYDEF_H */

@@ -1,6 +1,6 @@
 #include "ush.h"
 
-void pwd_func(t_main *interface)
+char *get_pwd(void) //memory allocation func
 {
     char *pwd;
     char *ptr;
@@ -18,8 +18,14 @@ void pwd_func(t_main *interface)
             strerror(errno);
     }
 
+    return pwd;
+}
+
+void pwd_func(t_main *interface)
+{
+    char *pwd = get_pwd();
     add_newline(&pwd);
-    calloc_args(&interface->result, 2);
-    write_arg(&interface->result, pwd);
+    calloc_args(interface->result, 2);
+    write_arg(interface->result, pwd);
     interface->status = 1;
 }

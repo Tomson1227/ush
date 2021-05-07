@@ -4,8 +4,8 @@ static void line_close(t_line **line, t_main *interface)
 {
     dup_command(interface->command, (*line)->line);
     char *clean_line = mx_del_extra_spaces((*line)->line);
-    interface->line_arg.number = mx_count_words(clean_line, ' ');
-    interface->line_arg.value = mx_strsplit(clean_line, ' ');  
+    interface->line_arg->number = mx_count_words(clean_line, ' ');
+    interface->line_arg->value = mx_strsplit(clean_line, ' ');  
     clear_line_struct(line);
 }
 
@@ -14,20 +14,10 @@ static void reset_line(t_line *line)
     mx_printstr(RESTORE_CURSOR_POS);
     ERASE_RIGHT;
     write(STDOUT_FILENO, (void *) line->line, strlen(line->line));
-    // mx_printstr("line position = ");
-    // mx_printint(line->position);
-    // mx_printchar('\n');
-
-    if(line->tab) {
-        mx_printchar('\n');
-        line->tab = false;
-        mx_print_strarr(line->tab_var, "\t");
-    }
-
     mx_printstr(RESTORE_CURSOR_POS);
+
     if(line->position)
         CURSOR_N_RIGHT((uint32_t)(line->position));
-
 }
 
 static void get_key_press(t_line *line)
@@ -39,16 +29,6 @@ static void get_key_press(t_line *line)
         
     tcsetattr(0, TCSANOW, &line->oterm1);
     read(STDIN_FILENO,line->key_press, 10); 
-
-    // for(uint8_t index = 0; line->key_press[index]; ++index) {
-    //     if(line->key_press[index] == KEY_ESCAPE)
-    //         mx_printstr("ESC");
-    //     else
-    //         mx_printint(line->key_press[index]);
-    //     mx_printchar(' ');
-    // }
-    // mx_printchar('\n');
-
     tcsetattr(0, TCSANOW, &line->term);
 }
 
@@ -292,22 +272,34 @@ static uint8_t process_key_press(t_line *line, t_main *interface)
         remove_char_left(line);
     }
     else if(line->key_press[0] == KEY_TAB) {
-        if(!line->tab) {
-            line->tab = true;
-            auto_completion(line);
+        if(line->line[0] && line->line[0] != ' ')  {
+            line->tab_func->tab_press = true;
+            autocomplete(line);
             reset_line(line);
         }
         else {
-            // change_var(line);
+            line->symbol = ' ';
+            add_char(line);
+            add_char(line);
+            add_char(line);
+            add_char(line);
         }
     }
     else if(line->key_press[0] == KEY_NEW_LINE) {
+        mx_printstr(RESTORE_CURSOR_POS);
+
+        if(line->position)
+            CURSOR_N_RIGHT((uint32_t)(line->size));
+        
+        mx_printchar('\n');
+        ERASE_DOWN;
+        CURSOR_UP;
         return 0;
     }
     else {
         line->symbol = line->key_press[0];
         add_char(line);
-        line->tab = false;
+        line->tab_func->tab_press = false;
     }
 
     return 1;
@@ -315,7 +307,7 @@ static uint8_t process_key_press(t_line *line, t_main *interface)
 
 void read_line(t_main *interface)
 {
-    new_command(&interface->command);
+    new_command_list(&interface->command);
     t_line *line = (t_line *) calloc(1, sizeof(t_line));
     init_line_struct(line, interface);
     write(STDOUT_FILENO, interface->prompt, mx_strlen(interface->prompt));

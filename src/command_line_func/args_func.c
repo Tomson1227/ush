@@ -1,18 +1,19 @@
 #include "ush.h"
 
-void print_args(t_main *interface) 
+void print_args(t_args *args) 
 {
-    if(interface->result.number == 0)
+    if(args->number == 0)
         return;
 
-    mx_printstr(interface->result.value[0]);   
+    mx_printstr(args->value[0]);   
 
-    for(uint8_t i = 1; interface->result.value[i]; ++i) {
+    for(uint8_t i = 1; args->value[i]; ++i) {
         mx_printchar(' ');
-        mx_printstr(interface->result.value[i]);
+        mx_printstr(args->value[i]);
     }
 
-    clean_args_struct(&interface->result);
+    del_args_structure(&args);
+    // clean_args_struct(args);
 }
 
 void calloc_args(t_args *args, uint16_t n)
