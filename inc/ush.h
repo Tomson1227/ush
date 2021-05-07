@@ -13,13 +13,19 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <dirent.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <spawn.h>
+#include <fcntl.h>
 
 #include "functions.h"
 #include "macros.h"
 #include "libmx.h"
 #include "struct.h"
 #include "keydef.h"
+#include "process.h"
 
+extern char **environ;
 extern struct termios stored_settings;
 
 #endif /* USH */

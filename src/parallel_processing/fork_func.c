@@ -1,6 +1,5 @@
 #include "ush.h"
 
-//create parallrl process and return it ID
 int create_fork(int *child_id)
 {
     int id = fork();
@@ -13,7 +12,6 @@ int create_fork(int *child_id)
     return id;
 }
 
-//wait antill process with given ID will die
 void wait_proc_to_die(int id)
 {
     int dead_id;
@@ -26,6 +24,3 @@ void wait_proc_to_die(int id)
             strerror(errno);
     }
 }
-
-
-

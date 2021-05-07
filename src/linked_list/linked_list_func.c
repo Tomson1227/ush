@@ -32,7 +32,7 @@ void dup_command(t_command_list *head, char *command)
     head->command = mx_strdup(command);
 }
 
-void new_command(t_command_list **head)
+void new_command_list(t_command_list **head)
 {
     t_command_list *new_command = init_command();
     
@@ -79,6 +79,3 @@ void del_command_list(t_command_list **head)
         (*head) = temp;
     }
 }
-
-
-
