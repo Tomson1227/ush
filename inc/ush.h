@@ -17,7 +17,8 @@
 #include <sys/stat.h>
 #include <spawn.h>
 #include <fcntl.h>
-
+#include <signal.h>
+    
 #include "functions.h"
 #include "macros.h"
 #include "libmx.h"
@@ -26,6 +27,5 @@
 #include "process.h"
 
 extern char **environ;
-extern struct termios stored_settings;
 
 #endif /* USH */

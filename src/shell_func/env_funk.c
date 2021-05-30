@@ -1,6 +1,6 @@
 #include "ush.h"
 
-void env_func(t_main *interface)
+void env_func(t_ush *ush, t_process *process)
 {
-    interface->status = 1;
+    ush->local_status = process->status = 0;
 }

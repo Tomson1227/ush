@@ -1,23 +1,21 @@
 #include "ush.h"
 
-struct termios stored_settings;
-char **environ;
-
-int main(int argn, char *argv[])
+int main(int argn, char *argv[], char **environ)
 {
-    t_main *interface = NULL;
-    init_main_struct(&interface);
-    // printf("interface created ? = %s\n", interface ? "True" : "False");
+    t_ush *ush = NULL;
+    init_ush_struct(&ush);
 
-    while (interface->status) {
-        // mx_printstr("main1\n");
-        read_line(interface);
-        // mx_printstr("main2\n");
-        execute(interface);
-        // mx_printstr("main3\n");
-        // clean_args_struct(interface->line_arg);
-        // mx_printstr("main4\n");
+    if(isatty(0)) {
+        while(ush->status == -1) {
+            gui_call(ush);
+            execute(ush);
+        }
     }
+    else 
+        pipe_call(ush);
 
-    return EXIT_SUCCESS;
+    del_ush_struct(&ush);
+    return ush->status;
+
+    return 0;
 }

@@ -1,7 +1,7 @@
 #ifndef STRUCT_H
 #define STRUCT_H
 
-typedef struct s_main t_main;
+typedef struct s_ush t_ush;
 
 typedef struct s_args {
     int number;
@@ -11,12 +11,11 @@ typedef struct s_args {
 typedef struct s_process {
     char *file;
     char *command;
+    char **args;
     int status;
-    uint64_t mode;
     pid_t pid;
-    t_args *result;
-    t_args *parameters;
-    posix_spawn_file_actions_t actions;
+    posix_spawn_file_actions_t *actions;
+    posix_spawnattr_t *attr;
 }              t_process;
 
 typedef struct s_process_list {
@@ -41,31 +40,29 @@ typedef struct s_tab_func {
     char *last_arg;
     char *serch_arg;
     char *path; 
-    bool command; // true - search for command // false - search for file name 
+    bool command;
 }              t_tab_func;
 
-    /* main struct */
-struct s_main {
-    t_args *line_arg;
-    t_args *func_arg;
-    t_args *result;
-    volatile int status;
+struct s_ush {
     char *prompt;
-    t_command_list *command;
+    char *home;
+    char **args;
+    char **bin_dirs;
+    volatile int status;
+    volatile int local_status;
+    struct termios term;
+    struct termios oterm;
+    t_process *process;
+    t_command_list *command_list;
     t_process_list *process_list;
 };
 
 typedef struct s_line {
-    t_command_list *last_command;
     char *line;
-    char *key_press;
-    size_t size;
-    size_t position;
-    int symbol;
+    char get_char;
+    int position;
     t_tab_func *tab_func;
-    struct termios term;
-    struct termios oterm1;
-    struct termios oterm2;
+    t_command_list *last_command;
 }              t_line;
 
 #endif /* All struct */

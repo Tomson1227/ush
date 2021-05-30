@@ -1,6 +1,7 @@
 #include "ush.h"
 
-void which_func(t_main *interface)
+void which_func(t_ush *ush, t_process *process)
 {
-    interface->status = 1;
+    
+    process->status = 0;
 }

@@ -5,7 +5,8 @@ int mx_atoi(const char *str) {
     int sum = 0;
     int flag = 1;
     
-    while(mx_isspace(str[count++]));
+    while(mx_isspace(str[count]))
+        count++;
     
     if(str[count] == '-' || str[count] == '+')
         flag = (str[count++] == '-') ? -1 : 1;

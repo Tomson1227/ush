@@ -21,11 +21,11 @@ char *get_pwd(void) //memory allocation func
     return pwd;
 }
 
-void pwd_func(t_main *interface)
+void pwd_func(t_ush *ush, t_process *process)
 {
-    char *pwd = get_pwd();
-    add_newline(&pwd);
-    calloc_args(interface->result, 2);
-    write_arg(interface->result, pwd);
-    interface->status = 1;
+    // char *pwd = get_pwd();
+    // add_newline(&pwd);
+    // calloc_args(ush->result, 2);
+    // write_arg(ush->result, pwd);
+    process->status = 0;
 }

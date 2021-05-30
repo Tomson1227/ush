@@ -1,18 +1,20 @@
 #include "ush.h"
 
-void cd_func(t_main *interface)
+void cd_func(t_ush *ush, t_process *process)
 {
-    if(!interface->func_arg->value[1])
-        interface->func_arg->value[1] = mx_strdup("/home/");
-
-    // ~ -> /home/{USER}
-
-    if(chdir(interface->func_arg->value[1]) == -1) {
-        strerror(errno);
-        interface->status = 0;
+    if(!process->args[1]) {
+        if(chdir("/home/") == -1) {
+            strerror(errno);
+            process->status = 1;
+        }
+    }
+    else {
+        if(chdir(process->args[1]) == -1) {
+            strerror(errno);
+            process->status = 0;
+        }
     }
 
-    mx_strdel(&interface->prompt);
-    set_prompt(interface);
-    interface->status = 1;
+    set_prompt(ush);
+    process->status = 0;
 }

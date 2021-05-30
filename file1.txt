@@ -1,2 +1,0 @@
-file content
-new line text    4 spaces  

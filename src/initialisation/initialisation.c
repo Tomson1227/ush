@@ -13,42 +13,67 @@ void del_args_structure(t_args **args)
 {
     (*args)->number = 0;
     
-    for(uint16_t index = 0; (*args)->value[index]; ++index) {
+    for(uint32_t index = 0; (*args)->value[index]; ++index) {
         mx_strdel(&(*args)->value[index]);
     }
 
     free((*args)->value);
     (*args)->value = NULL;
     
-    // mx_del_strarr(&(*args)->value);
     free(*args);
     *args = NULL;
 }
 
-void set_prompt(t_main *interface)
+void set_prompt(t_ush *ush)
 {
     char *read_pwd = get_pwd();
+    int index;
+
+    if((index = mx_get_substr_index(read_pwd, ush->home)) >= 0)
+        replace_str(read_pwd, &read_pwd[index], strlen(ush->home), "~");
+
     size_t prompt_size = snprintf(NULL, 0, "%s%sU$H>%s:%s%s%s$ ", 
                                 BOLD, FG_COLOR_GREEN, FG_COLOR_RESET,
                                 FG_COLOR_BLUE, read_pwd, RESET_ALL);
-    interface->prompt = (char *) calloc(prompt_size, sizeof(char));
-    sprintf(interface->prompt, "%s%sU$H>%s:%s%s%s$ ",
+    ush->prompt = (char *) calloc(prompt_size, sizeof(char));
+    sprintf(ush->prompt, "%s%sU$H>%s:%s%s%s$ ",
             BOLD, FG_COLOR_GREEN, FG_COLOR_RESET,
             FG_COLOR_BLUE, read_pwd, RESET_ALL);
+    
+    mx_strdel(&read_pwd);
 }
 
-void init_main_struct(t_main **interface)
-{  
-    if(!(*interface = (t_main *) calloc(1, sizeof(t_main))))  
+static void init_term_modes(t_ush *ush)
+{    
+    tcgetattr(0, &ush->term);
+    memcpy(&ush->oterm, &ush->term, sizeof(struct termios));
+    ush->oterm.c_lflag &= ~(ICANON | ECHO); //ISIG
+    ush->oterm.c_cc[VMIN] = 1;
+    ush->oterm.c_cc[VTIME] = 0;
+}
+
+void init_ush_struct(t_ush **ush)
+{ 
+    if(!(*ush = (t_ush *) calloc(1, sizeof(t_ush))))  
         strerror(errno);
 
-    (*interface)->status = 1;
-    init_args_struct(&(*interface)->func_arg);
-    init_args_struct(&(*interface)->line_arg);
-    init_args_struct(&(*interface)->result);
-    (*interface)->command = NULL;
-    set_prompt(*interface);
-    (*interface)->process_list = NULL;
+    (*ush)->home = get_env_value("HOME");
+    (*ush)->bin_dirs = mx_strsplit(getenv("PATH"), ':');
+    (*ush)->status = -1;
+    (*ush)->local_status = 0;
+    set_prompt(*ush);
+    init_term_modes((*ush));
+    (*ush)->args = NULL;
+    (*ush)->command_list = NULL;
+    (*ush)->process_list = NULL;
+}
+
+void del_ush_struct(t_ush **ush)
+{
+    (*ush)->args = NULL;
+    del_command_list(&(*ush)->command_list);
+    mx_strdel(&(*ush)->prompt);
+    mx_strdel(&(*ush)->home);
 }
 
 static inline t_tab_func *init_tab_struct(void)
@@ -57,6 +82,7 @@ static inline t_tab_func *init_tab_struct(void)
     
     if(!(tab_func = (t_tab_func *) calloc(1, sizeof(t_tab_func))))
         strerror(errno);
+    
     tab_func->var_index = 0;
     tab_func->var_num = 0;
     tab_func->variants = NULL;
@@ -69,30 +95,20 @@ static inline t_tab_func *init_tab_struct(void)
     return tab_func;
 }
 
-void init_line_struct(t_line *line, t_main *interface)
+void init_line_struct(t_line *line, t_ush *ush)
 {
-    tcgetattr(0, &line->term);
-    memcpy(&line->oterm1, &line->term, sizeof(struct termios));
-    line->oterm1.c_lflag &= ~(ICANON | ECHO); //ISIG
-    line->oterm1.c_cc[VMIN] = 1;
-    line->oterm1.c_cc[VTIME] = 0;
-
     line->line = (char *) calloc(BUFSIZE, sizeof(char));
-    line->size = 0;
+    line->get_char = 0;
     line->position = 0;
-    line->symbol = '\0';
-    line->last_command = interface->command;
-    line->key_press = (char *) calloc(10, sizeof(char));
+    line->last_command = ush->command_list;
     line->tab_func = init_tab_struct();
 }
 
-void clear_line_struct(t_line **line)
+void del_line_struct(t_line **line)
 {
     free((*line)->line);
     (*line)->line = NULL;
-    (*line)->size = 0;
     (*line)->position = 0;
-    (*line)->symbol = '\0';
     (*line)->last_command = NULL;
     free(*line);
     *line = NULL;

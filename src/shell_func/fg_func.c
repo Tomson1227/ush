@@ -1,6 +1,6 @@
 #include "ush.h"
 
-void fg_func(t_main *interface)
+void fg_func(t_ush *ush, t_process *process)
 {
-    interface->status = 1;
+    process->status = 0;
 }

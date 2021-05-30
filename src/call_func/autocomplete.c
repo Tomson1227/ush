@@ -119,6 +119,7 @@ static void search_file(t_line *line, t_tab_func *tab_func)
     struct stat dir_stat;
     struct dirent *dir_param = NULL;
     char *path_name = NULL;
+    
     devide_path_file(line->tab_func);
     dir = opendir(tab_func->path);
 
@@ -206,14 +207,20 @@ static void print_column(t_tab_func *tab_fuck)
 static void line_autocomplete(t_line *line)
 {
     mx_strcpy(&line->line[line->tab_func->line_index], line->tab_func->variants[line->tab_func->var_index++]);
-    line->size = mx_strlen(line->line);
-    line->position = line->size;
+    line->position = mx_strlen(line->line);
 
     free(line->tab_func->last_arg);
     line->tab_func->last_arg = get_last_arg(line);
 
     if(line->tab_func->var_index >= line->tab_func->var_num)
         line->tab_func->var_index = 0;
+}
+
+static void add_char(char *str, char c)
+{
+    size_t last_index = strlen(str);
+    str[last_index++] = c;
+    str[last_index] = '\0';
 }
 
 void autocomplete(t_line *line)
@@ -232,11 +239,15 @@ void autocomplete(t_line *line)
         line_autocomplete(line);
     }
 
-    if(line->tab_func->var_num > 1)
+    if(line->tab_func->var_num > 1) {
+        reset_line(line);
         print_column(line->tab_func);
+    }
     else if(line->tab_func->var_num){
         line_autocomplete(line);
+        add_char(line->line, ' ');
         line->tab_func->last_arg[0] = 0x1B;
         ERASE_DOWN;
     }
+    reset_cursore_position(line);
 }
