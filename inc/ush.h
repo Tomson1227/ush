@@ -18,7 +18,8 @@
 #include <spawn.h>
 #include <fcntl.h>
 #include <signal.h>
-    
+#include <getopt.h>
+
 #include "functions.h"
 #include "macros.h"
 #include "libmx.h"

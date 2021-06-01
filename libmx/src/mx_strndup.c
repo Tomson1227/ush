@@ -1,6 +1,5 @@
 #include "libmx.h"
-
-#include <stdio.h>
+    
 char *mx_strndup(const char *s1, size_t n)
 {
     char *result = NULL;

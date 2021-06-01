@@ -22,10 +22,14 @@ Test 4: Test which
 input:
 output: exit: ush built-in command
 
+DONE!!!
+
 Test 5: Test which with options
 
 input:
 output: echo: ush built-in command
+
+DONE!!!
 
 Test 6: Test which with options2
 
@@ -33,11 +37,15 @@ input:
 output: asdasdasdasdsa not found
 > 1
 
+DONE!!!
+
 Test 7: Test which with options3
 
 input:
 output: echo: ush built-in command
 > 0
+
+DONE!!!
 
 Test 10: Test cd + pwd with a root
 

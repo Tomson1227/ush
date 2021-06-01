@@ -373,10 +373,10 @@ void get_user_input(t_line *line, t_ush *ush)
 }
 
 /* Debug */
-void print_arg(t_ush *ush)
+void print_arg(char **args)
 {
-    for(uint16_t index = 0; ush->args[index]; ++index) {
-        mx_printstr(ush->args[index]);
+    for(uint16_t index = 0; args[index]; ++index) {
+        mx_printstr(args[index]);
         mx_printchar('$');
     }
     
@@ -394,7 +394,7 @@ void gui_call(t_ush *ush)
     SAVE_CURSOR_POS;
     reset_line(line);
     get_user_input(line, ush);
-    validate_args(ush, line);
+    validate_args(ush, line->line);
 
     // print_arg(ush);
 

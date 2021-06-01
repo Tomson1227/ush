@@ -1,117 +1,76 @@
 #include "ush.h"
 
-//temp struct
-// typedef struct s_echo_func {
-//     bool flag_n;
-//     bool flag_e;
-//     uint8_t offset;
-// }      t_echo_func;
+static void disable_special_symbols(char **args);
 
-// static inline void read_flags(t_ush *ush, t_echo_func *flags)
-// {
-//     while(!mx_strncmp(ush->func_arg->value[flags->offset], "-", 1)) {
-//         for(int j = 1; ush->func_arg->value[flags->offset][j]; ++j) {
-//             if(ush->func_arg->value[flags->offset][j] == 'n')
-//                 flags->flag_n = 0;
-//             else if(ush->func_arg->value[flags->offset][j] == 'e')
-//                 flags->flag_e = 1;
-//             else if(ush->func_arg->value[flags->offset][j] == 'E')
-//                 flags->flag_e = 0;
-
-//             ++flags->offset;
-//         }
-//     }
-// }
-
-// static inline t_echo_func *init_echo_struct(void)
-// {
-//     t_echo_func *echo_struct = (t_echo_func *) calloc(1, sizeof(t_echo_func));
-//     echo_struct->flag_n = 1;
-//     echo_struct->flag_e = 0;
-//     echo_struct->offset = 1;
-
-//     return echo_struct;
-// }
-
-// static size_t count_escapes(char *text)
-// {
-//     size_t count = 0;
-
-//     for(size_t index = 0; text[index]; ++index) {
-//         if(text[count] >= 0x7 && text[count] <= 0xD)    
-//             ++count;
-//     }
-
-//     return count;
-// }
-
-// static char get_excape(char c)
-// {
-//     switch (c) {
-//         case '\a':
-//             return 'a';
-//         case '\b':
-//             return 'b';
-//         case '\f':
-//             return 'f';
-//         case '\n':
-//             return 'n';
-//         case '\r':
-//             return 'r';
-//         case '\t':
-//             return 't';
-//         case '\v':
-//             return 'v';
-//         default:
-//             return c;
-//     }
-// }
-
-// static void text_modify(char **text)
-// {
-//     size_t count = count_escapes(*text);
-//     char *new_str = NULL;
-
-//     if(!count)
-//         return;
-
-//     if(!(new_str = calloc(mx_strlen(*text) + count, sizeof(char))))
-//         strerror(errno);
-
-//     for(size_t i = 0, j = 0; *text[i]; ++i, ++j) {
-//         if((*text[i] >= 0x7 && *text[i] <= 0xD)) {
-//             new_str[j++] = '\\';
-//             new_str[j] = get_excape(*text[i]);
-//         }
-//         else
-//             new_str[j] = *text[i];
-//     }
-
-//     free(*text);
-//     *text = new_str;
-// }
-
+/*
+-n не выводить в конце символ новой строки
+-e включить интерпретацию управляющих символов (default)
+-E отключить интерпретацию управляющих символов
+*/
 void echo_func(t_ush *ush, t_process *process)
 {
-    // t_echo_func *flags = init_echo_struct();
-    // read_flags(ush, flags);
-    
-    // if(flags->flag_e) {
-    //     for(uint8_t index = 0; ush->func_arg->value[index];) {
-    //         text_modify(&ush->func_arg->value[index]);
-    //     }
-    // }
+    uint32_t options = get_opt(process->args, "neE");
+    uint32_t index = start_index(&process->args[1]) + 1;
+    uint8_t opt_n = READ_OPT(options, 1);
+    uint8_t opt_e = READ_OPT(options, 2);
+    uint8_t opt_E = READ_OPT(options, 4);
 
-    // if(flags->flag_n)
-    //     add_newline(&ush->func_arg->value[ush->func_arg->number - 1]);
+    if(opt_E)
+        disable_special_symbols(&process->args[index]);
 
-    // copy_args(ush->result, ush->func_arg);
+    for(; process->args[index]; ++index)
+        printf("%s ", process->args[index]);
+
+    if(!opt_n)
+        printf("\n");
+
     process->status = 0;
 }
 
-//-n не выводить в конце символ новой строки
-//-e включить интерпретацию управляющих символов, перечисленных ниже
-//-E отключить интерпретацию ткаих управляющих символов в СТРОКах
+static void disable_special_symbols(char **args)
+{
+    // int i = 0;
+
+    // for(uint32_t index = 0; args[index]; ++index) {
+    //     i = 0;
+    //     while(args[index][i] && (i = mx_get_substr_index(&args[index][i], "\a")) >= 0) {
+    //         printf("TP1 index = %d, char = %d\n", i, args[index][i]);
+    //         replace_str(&args[index], i++, 1, "\\a");
+    //         printf("TP2 index = %d, char = %d\n\n", i, args[index][i]);
+    //     }
+    //     printf("TP1\n");
+    //     i = 0;
+    //     while((i = mx_get_char_index(&args[index][i], '\b')) >= 0) {
+    //         replace_str(&args[index], i, 1, "\\b");
+    //         i += 2;
+    //     }
+    //     printf("TP2\n");
+    //     i = 0;
+    //     while((i = mx_get_char_index(&args[index][i], '\t')) >= 0) {
+    //         replace_str(&args[index], i, 1, "\\t");
+    //         i += 2;
+    //     }
+    //     printf("TP3\n");
+    //     i = 0;
+    //     while((i = mx_get_char_index(&args[index][i], '\n')) >= 0) {
+    //         replace_str(&args[index], i, 1, "\\n");
+    //         i += 2;
+    //     }
+    //     printf("TP4\n");
+    //     i = 0;
+    //     while((i = mx_get_char_index(&args[index][i], '\v')) >= 0) {
+    //         replace_str(&args[index], i, 1, "\\v");
+    //         i += 2;
+    //     }
+    //     printf("TP5\n");
+    //     i = 0;
+    //     while((i = mx_get_char_index(&args[index][i], '\f')) >= 0) {
+    //         replace_str(&args[index], i, 1, "\\f");
+    //         i += 2;
+    //     }
+    //     printf("TP6\n");
+    // }
+}
 
 /*
 \NNN символ с ASCII кодом NNN (восьмеричное)

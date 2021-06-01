@@ -48,6 +48,7 @@ struct s_ush {
     char *home;
     char **args;
     char **bin_dirs;
+    char **built_in;
     volatile int status;
     volatile int local_status;
     struct termios term;

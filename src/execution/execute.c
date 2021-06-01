@@ -3,9 +3,8 @@
 /* Debug func */
 void print_process_list(t_ush *ush)
 {
-    if(!ush->process_list) {
+    if(!ush->process_list)
         mx_printstr("Empty list");
-    }
 
     t_process_list *curent_list = ush->process_list;
     
@@ -36,15 +35,15 @@ void print_process_list(t_ush *ush)
     mx_printchar('\n');
 }
 
-void (*builtin_func[]) (t_ush *, t_process *) = {
+void (*built_in_func[]) (t_ush *, t_process *) = {
     &exit_func,
     &unset_func,
     &export_func,
-    // &env_func,
+    &env_func,
     &cd_func,
-    // &pwd_func,
+    &pwd_func,
     &which_func,
-    // &echo_func,
+    &echo_func,
     &fg_func
 };
 
@@ -78,23 +77,10 @@ static void start_process(t_process *process)
 }
 
 /* Return index of build in command othrwise -1 */
-static int build_in_func_index(char *command)
+static int built_in_func_index(t_ush *ush, char *command)
 {
-    char *build_in_func[] = {
-        "exit",     //0
-        "unset",    //1
-        "export",   //2
-        // "env",      //3
-        "cd",       //4
-        // "pwd",      //5
-        "whitch",   //6
-        // "echo",     //7
-        "fg",       //8
-        NULL 
-    };
-
-    for(uint8_t index = 0; build_in_func[index]; ++index) {
-        if(!mx_strcmp(build_in_func[index], command))
+    for(uint8_t index = 0; ush->built_in[index]; ++index) {
+        if(!mx_strcmp(ush->built_in[index], command))
             return index;
     }
 
@@ -109,12 +95,13 @@ static void run_process_list(t_ush *ush)
     while(ush->process_list) {
         int command_index;
 
-        if((command_index = build_in_func_index(ush->process_list->process->command)) != -1) {
-            builtin_func[command_index](ush, ush->process_list->process);
+        if((command_index = built_in_func_index(ush, ush->process_list->process->command)) != -1) {
+            built_in_func[command_index](ush, ush->process_list->process);
         }
         else
             start_process(ush->process_list->process);
 
+        ush->local_status = ush->process_list->process->status;
         ush->process_list = ush->process_list->next_process;
     }
 }

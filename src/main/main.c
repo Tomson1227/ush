@@ -16,6 +16,4 @@ int main(int argn, char *argv[], char **environ)
 
     del_ush_struct(&ush);
     return ush->status;
-
-    return 0;
 }

@@ -8,7 +8,7 @@ void start_gui(void);
 void gui_call(t_ush *ush);
 void pipe_call(t_ush *ush);
 void execute(t_ush *ush);
-void validate_args(t_ush *ush, t_line *line);
+void validate_args(t_ush *ush, char *line);
 void get_user_input(t_line *line, t_ush *ush);
 
 void exit_func(t_ush *ush, t_process *process);
@@ -46,6 +46,12 @@ void get_process_args(t_ush *ush, t_process *process);
 char *get_env_value(char *env_key);
 char *get_pwd(void); //memory allocation func
 char *find_value(char *str);
-void replace_str(char *src, char *start_point, size_t length, char *str);
+void replace_str(char **src, size_t start_index, size_t length, char *str);
+uint32_t get_opt(char **argv, char *seach_opt);
+uint32_t count_args(char **argv);
+uint32_t start_index(char **argv);
+
+/* Debug */
+void print_arg(char **args);
 
 #endif /* FUNCTION_H */
