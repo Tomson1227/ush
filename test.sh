@@ -15,15 +15,15 @@ echo "TM0dRGgUenQO7IugMZHL920bsPOD3GVF4H7NVbAtSferTxcCoiUoLK8CtZ5CIAddwQvYoAruJi
 echo "/------------------------------------------------------------------------/"
 echo "Test 3 Test echo with escape sequences"
 echo "ush :"
-echo 'echo -e "\t \v \a MwdFmFpmm \v \twwimyHu8qA \a"' | ./ush
+echo 'echo -e "\\t \\v \\a MwdFmFpmm \\v \\twwimyHu8qA \\a"' | ./ush
 echo "zsh :"
-echo -e "\t \v \a MwdFmFpmm \v \twwimyHu8qA \a"
+echo -e "\\t \\v \\a MwdFmFpmm \\v \\twwimyHu8qA \\a"
 
 echo "Test 3_1 Test with -E option"
 echo "ush :"
-echo 'echo -E "\t \v \a MwdFmFpmm \v \twwimyHu8qA \a"' | ./ush
+echo 'echo -E "\\t \\v \\a MwdFmFpmm \\v \\twwimyHu8qA \\a"' | ./ush
 echo "zsh :"
-echo -E "\t \v \a MwdFmFpmm \v \twwimyHu8qA \a"
+echo -E "\\t \\v \\a MwdFmFpmm \\v \\twwimyHu8qA \\a"
 
 echo "/------------------------------------------------------------------------/"
 echo "Test 4 Test which"
@@ -53,19 +53,19 @@ echo "which echo" | ./ush ; echo $?
 echo "zsh :"
 echo "echo: ush built-in command\n0"
 
-echo "/------------------------------------------------------------------------/"
-echo "Test 10 Test cd + pwd with a root"
-echo "ush :"
-echo 'echo ' | ./ush
-echo "zsh :"
-echo ""
+# echo "/------------------------------------------------------------------------/"
+# echo "Test 10 Test cd + pwd with a root"
+# echo "ush :"
+# echo 'echo ' | ./ush
+# echo "zsh :"
+# echo ""
 
-echo "/------------------------------------------------------------------------/"
-echo "Test 12 Test cd + pwd with options"
-echo "ush :"
-echo 'echo ' | ./ush
-echo "zsh :"
-echo ""
+# echo "/------------------------------------------------------------------------/"
+# echo "Test 12 Test cd + pwd with options"
+# echo "ush :"
+# echo 'echo ' | ./ush
+# echo "zsh :"
+# echo ""
 
 echo "/------------------------------------------------------------------------/"
 echo "Test 14 Test simple command substitution"
@@ -82,25 +82,25 @@ echo "zsh :"
 echo "Hello, $(whoami)! $(echo "Hello, $(whoami)")"
 
 echo "/------------------------------------------------------------------------/"
-echo "Test 16 Test Test complicated command substitution2"
+echo "Test 16 Test complicated command substitution2"
 echo "ush :"
-echo 'echo "$(echo $(pwd))"' | ./ush
+echo "echo $(echo $(pwd))" | ./ush
 echo "zsh :"
 echo "$(echo $(pwd))"
 
 echo "/------------------------------------------------------------------------/"
 echo "Test 17 Test work with shell variables"
 echo "ush :"
-echo 'echo ${SHLVL} ${HOME} ${LOGNAME} ${USR} ${TERM}' | ./ush
+echo 'echo ${SHLVL} ${HOME} ${LOGNAME} ${USER} ${TERM}' | ./ush
 echo "zsh :"
-echo "${SHLVL} ${HOME} ${LOGNAME} ${USR} ${TERM}" #"2 /Users/oracle oracle"
+echo ${SHLVL} ${HOME} ${LOGNAME} ${USER} ${TERM} #"2 /Users/oracle oracle"
 
 echo "/------------------------------------------------------------------------/"
 echo "Test 18 Test tilde expansion"
 echo "ush :"
-echo 'echo ' | ./ush
+echo "cd ~ ; pwd" | ./ush
 echo "zsh :"
-echo "/Users/oracle"
+cd ~ ; pwd ; cd -
 
 echo "/------------------------------------------------------------------------/"
 echo "Test 19 Test work with shell variables2"
@@ -113,9 +113,9 @@ echo "$UNIT $UFK $ucode" #location p2p cbl
 echo "/------------------------------------------------------------------------/"
 echo "Test 20 Test work with shell variables3"
 echo "ush :"
-echo "export UNIT=location UFK=p2p ucode=cbl ; echo $UNIT $UFK $ucode ; unset UNIT= UFK= ucode= ; echo $UNIT $UFK $ucode" | ./ush
-OR
-echo "export UNIT=location UFK=p2p ucode=cbl ; echo $UNIT $UFK $ucode ; export UNIT='' UFK='' ucode='' ; echo $UNIT $UFK $ucode" | ./ush
+echo "UNIT=location UFK=p2p ucode=cbl ; echo $UNIT $UFK $ucode ; unset UNIT UFK ucode ; echo $UNIT $UFK $ucode" | ./ush
+# OR
+# echo "export UNIT=location UFK=p2p ucode=cbl ; echo $UNIT $UFK $ucode ; export UNIT='' UFK='' ucode='' ; echo $UNIT $UFK $ucode" | ./ush
 echo "zsh :"
 UNIT=location UFK=p2p ucode=cbl
 echo "$UNIT $UFK $ucode" #location p2p cbl

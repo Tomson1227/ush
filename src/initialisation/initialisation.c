@@ -27,15 +27,16 @@ void del_args_structure(t_args **args)
 void set_prompt(t_ush *ush)
 {
     char *read_pwd = get_pwd();
-    int index = mx_get_substr_index(read_pwd, ush->home);
+    char *home = getenv("HOME");
+    int index = mx_get_substr_index(read_pwd, home);
 
     if(index >= 0)
-        replace_str(&read_pwd, index, strlen(ush->home), "~");
+        replace_str(&read_pwd, index, strlen(home), "~");
 
     size_t prompt_size = snprintf(NULL, 0, "%s%sU$H>%s:%s%s%s$ ", 
                                 BOLD, FG_COLOR_GREEN, FG_COLOR_RESET,
                                 FG_COLOR_BLUE, read_pwd, RESET_ALL);
-    ush->prompt = (char *) calloc(prompt_size, sizeof(char));
+    ush->prompt = mx_strnew(prompt_size);
     
     sprintf(ush->prompt, "%s%sU$H>%s:%s%s%s$ ",
             BOLD, FG_COLOR_GREEN, FG_COLOR_RESET,
@@ -72,14 +73,15 @@ void init_ush_struct(t_ush **ush)
 { 
     if(!(*ush = (t_ush *) calloc(1, sizeof(t_ush))))  
         strerror(errno);
-
-    (*ush)->home = get_env_value("HOME");
-    (*ush)->bin_dirs = mx_strsplit(getenv("PATH"), ':');
-    init_built_in(&(*ush)->built_in);
+    
     (*ush)->status = -1;
     (*ush)->local_status = 0;
+    init_shell_env(*ush);
+    (*ush)->home = mx_strdup(getenv("HOME"));
+    (*ush)->bin_dirs = mx_strsplit(getenv("PATH"), ':');
+    init_built_in(&(*ush)->built_in);
     set_prompt(*ush);
-    init_term_modes((*ush));
+    init_term_modes(*ush);
     (*ush)->args = NULL;
     (*ush)->command_list = NULL;
     (*ush)->process_list = NULL;
@@ -88,6 +90,7 @@ void init_ush_struct(t_ush **ush)
 void del_ush_struct(t_ush **ush)
 {
     (*ush)->args = NULL;
+    del_shell_env((*ush)->env);
     del_command_list(&(*ush)->command_list);
     mx_strdel(&(*ush)->prompt);
     mx_strdel(&(*ush)->home);

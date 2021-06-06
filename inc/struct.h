@@ -43,6 +43,14 @@ typedef struct s_tab_func {
     bool command;
 }              t_tab_func;
 
+
+typedef struct s_shell_env_list {
+    char *variable; 
+    char *value; 
+    bool exp;
+    struct s_shell_env_list *next_list;
+}              t_shell_env_list;
+
 struct s_ush {
     char *prompt;
     char *home;
@@ -54,6 +62,7 @@ struct s_ush {
     struct termios term;
     struct termios oterm;
     t_process *process;
+    t_shell_env_list *env;
     t_command_list *command_list;
     t_process_list *process_list;
 };

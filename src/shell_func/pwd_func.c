@@ -25,37 +25,22 @@ char *get_pwd(void) //memory allocation func
 -L Use PWD from environment, even if it contains symbolic links
 -P Avoid all symbolic links
 */
-
 void pwd_func(t_ush *ush, t_process *process)
 {
     uint32_t options = get_opt(process->args, "LP");
     uint8_t opt_L = READ_OPT(options, 1);
     uint8_t opt_P = READ_OPT(options, 2);
+  
+    char *pwd; 
 
-    char *pwd = getcwd(NULL, 0);
-    char **path = NULL;
-
-    if (process->args[1] != NULL && !strcmp(process->args[1], "-P")) {
-        write(1, pwd, strlen(pwd));
-        write(1, "\n", 1);
-        mx_strdel(&pwd);
-        process->status = 0;
-        return;
+    if(opt_L) {
+        pwd = get_env_value(ush, "PWD");
     }
-
-    path = mx_strsplit(pwd, '/');
-
-    if (*path == NULL)
-        mx_printstr("/");
     else {
-        for (int i = 0; path[i]; i++) {
-            mx_printstr("/");
-            mx_printstr(path[i]);
-        }
+        pwd = realpath(".", NULL);
     }
-    
-    write(1, "\n", 1);
-    mx_del_strarr(&path);
+
+    printf("%s\n", pwd);
     mx_strdel(&pwd);
 
     process->status = 0;

@@ -1,26 +1,22 @@
 #include "ush.h"
 
-// static int get_cursore_position(t_line *line)
-// {
-//     char buf;
-//     char numb[10];
-//     int index = 0;
+void gui_call(t_ush *ush)
+{
+    new_command_list(&ush->command_list);
 
-//     GET_CURSOR;
+    t_line *line = (t_line *) calloc(1, sizeof(t_line));
+    init_line_struct(line, ush);
 
-//     read(STDIN_FILENO, &buf, 1);
+    mx_printstr(ush->prompt);
+    SAVE_CURSOR_POS;
+    reset_line(line);
 
-//     while(buf != ';' && buf != '\0')    
-//         read(STDIN_FILENO, &buf, 1);
-    
-//     while(buf != 'R' && buf != '\0') {
-//         numb[index++] = buf;
-//         numb[index] = '\0';
-//         read(STDIN_FILENO, &buf, 1);            
-//     }
-
-//     return mx_atoi(numb);
-// }
+    get_user_input(line, ush);
+    validate_args(ush, line->line);
+    // print_arg(ush);
+    dup_command(ush->command_list, line->line);
+    del_line_struct(&line);
+}
 
 void reset_cursore_position(t_line *line)
 {
@@ -367,6 +363,7 @@ void get_user_input(t_line *line, t_ush *ush)
 
     while(mx_count_chars(line->line, '\"') % 2) {
        add_line(ush, line);
+       write(STDIN_FILENO, "\n", 1);
     }
 
     tcsetattr(0, TCSANOW, &ush->term);
@@ -383,21 +380,24 @@ void print_arg(char **args)
     mx_printchar('\n');
 }
 
-void gui_call(t_ush *ush)
-{
-    new_command_list(&ush->command_list);
+// static int get_cursore_position(t_line *line)
+// {
+//     char buf;
+//     char numb[10];
+//     int index = 0;
 
-    t_line *line = (t_line *) calloc(1, sizeof(t_line));
-    init_line_struct(line, ush);
+//     GET_CURSOR;
 
-    mx_printstr(ush->prompt);
-    SAVE_CURSOR_POS;
-    reset_line(line);
-    get_user_input(line, ush);
-    validate_args(ush, line->line);
+//     read(STDIN_FILENO, &buf, 1);
 
-    // print_arg(ush);
+//     while(buf != ';' && buf != '\0')    
+//         read(STDIN_FILENO, &buf, 1);
+    
+//     while(buf != 'R' && buf != '\0') {
+//         numb[index++] = buf;
+//         numb[index] = '\0';
+//         read(STDIN_FILENO, &buf, 1);            
+//     }
 
-    dup_command(ush->command_list, line->line);
-    del_line_struct(&line);
-}
+//     return mx_atoi(numb);
+// }

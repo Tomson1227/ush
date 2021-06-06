@@ -15,8 +15,11 @@ void echo_func(t_ush *ush, t_process *process)
     uint8_t opt_e = READ_OPT(options, 2);
     uint8_t opt_E = READ_OPT(options, 4);
 
-    if(opt_E)
+    if(!opt_E)
         disable_special_symbols(&process->args[index]);
+
+    if(process->args[index])
+        printf("%s", process->args[index++]);
 
     for(; process->args[index]; ++index)
         printf("%s ", process->args[index]);
@@ -29,47 +32,28 @@ void echo_func(t_ush *ush, t_process *process)
 
 static void disable_special_symbols(char **args)
 {
-    // int i = 0;
+    int i = 0;
 
-    // for(uint32_t index = 0; args[index]; ++index) {
-    //     i = 0;
-    //     while(args[index][i] && (i = mx_get_substr_index(&args[index][i], "\a")) >= 0) {
-    //         printf("TP1 index = %d, char = %d\n", i, args[index][i]);
-    //         replace_str(&args[index], i++, 1, "\\a");
-    //         printf("TP2 index = %d, char = %d\n\n", i, args[index][i]);
-    //     }
-    //     printf("TP1\n");
-    //     i = 0;
-    //     while((i = mx_get_char_index(&args[index][i], '\b')) >= 0) {
-    //         replace_str(&args[index], i, 1, "\\b");
-    //         i += 2;
-    //     }
-    //     printf("TP2\n");
-    //     i = 0;
-    //     while((i = mx_get_char_index(&args[index][i], '\t')) >= 0) {
-    //         replace_str(&args[index], i, 1, "\\t");
-    //         i += 2;
-    //     }
-    //     printf("TP3\n");
-    //     i = 0;
-    //     while((i = mx_get_char_index(&args[index][i], '\n')) >= 0) {
-    //         replace_str(&args[index], i, 1, "\\n");
-    //         i += 2;
-    //     }
-    //     printf("TP4\n");
-    //     i = 0;
-    //     while((i = mx_get_char_index(&args[index][i], '\v')) >= 0) {
-    //         replace_str(&args[index], i, 1, "\\v");
-    //         i += 2;
-    //     }
-    //     printf("TP5\n");
-    //     i = 0;
-    //     while((i = mx_get_char_index(&args[index][i], '\f')) >= 0) {
-    //         replace_str(&args[index], i, 1, "\\f");
-    //         i += 2;
-    //     }
-    //     printf("TP6\n");
-    // }
+    for(uint32_t index = 0; args[index]; ++index) {
+        i = 0;
+        while((i = mx_get_substr_index(&args[index][i], "\\a")) >= 0)
+            replace_str(&args[index], i++, 2, "\a");
+        i = 0;
+        while((i = mx_get_substr_index(&args[index][i], "\\b")) >= 0)
+            replace_str(&args[index], i++, 2, "\b");
+        i = 0;
+        while((i = mx_get_substr_index(&args[index][i], "\\t")) >= 0)
+            replace_str(&args[index], i++, 2, "\t");
+        i = 0;
+        while((i = mx_get_substr_index(&args[index][i], "\\n")) >= 0)
+            replace_str(&args[index], i++, 2, "\n");
+        i = 0;
+        while((i = mx_get_substr_index(&args[index][i], "\\v")) >= 0)
+            replace_str(&args[index], i++, 2, "\v");
+        i = 0;
+        while((i = mx_get_substr_index(&args[index][i], "\\f")) >= 0)
+            replace_str(&args[index], i++, 2, "\f");
+    }
 }
 
 /*

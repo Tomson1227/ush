@@ -1,7 +1,9 @@
 #ifndef KEYDEF_H
-#define KEYDEF_H 
+#define KEYDEF_H
 
-#include "ush.h"
+#define BUFSIZE     1024
+
+#define READ_OPT(reg, flag) !!(reg & (flag))
 
 #define KEY_BACKSPASE   0x7F
 #define KEY_NEW_LINE    0x0A

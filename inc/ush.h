@@ -19,13 +19,13 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <getopt.h>
+#include <pwd.h>
+#include <uuid/uuid.h>
 
-#include "functions.h"
-#include "macros.h"
 #include "libmx.h"
-#include "struct.h"
+#include "functions.h"
 #include "keydef.h"
-#include "process.h"
+// #include "process.h"
 
 extern char **environ;
 

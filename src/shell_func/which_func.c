@@ -43,7 +43,7 @@ void which_func(t_ush *ush, t_process *process)
         }
 
         if(status && !opt_s)
-            fprintf(stderr, "%s not found\n", process->args[index]);
+            printf("%s not found\n", process->args[index]);
 
         process->status |= status;
     }

@@ -24,18 +24,51 @@ uint32_t get_opt(char **argv, char *seach_opt)
 
 uint32_t count_args(char **argv)
 {
-    uint32_t count;
+    uint32_t count = 0;
 
-    for(count = 0; argv[count]; ++count);
+    if(!argv)
+        return count;
+
+    for( ; argv[count]; ++count);
 
     return count;
 }
 
 uint32_t start_index(char **argv)
 {
-    uint32_t count;
+    uint32_t count = 0;
 
-    for(count = 0; argv[count][0] == '-'; ++count);
+    if(!argv)
+        return count;
+
+    for( ; argv[count][0] == '-'; ++count);
 
     return count;
 }
+
+// static char *is_param_exist(char **env, char *param) {
+//     if(!env)
+//         return NULL;
+    
+//     for(uint64_t index = 0; env[index]; ++index) {
+//         if(!mx_strncmp(env[index], param, strlen(param)))
+//             return env[index];
+//     }
+
+//     return NULL;
+// } 
+
+// static void add_sheel_env(char ***env, char *param, char *value)
+// {
+//     char *new_param = mx_strnew(strlen(param) + strlen(value) + 2);
+//     sprintf(new_param, "%s=%s", param, value);
+//     uint32_t count = count_args(*env);
+
+//     if(malloc_size(*env) <= count) {
+//         if(!(*env = (char **) realloc(*env, count + 1)))
+//             perror("ush :");
+//     }
+
+//     (*env)[count++] = new_param;
+//     (*env)[count] = NULL;
+// }

@@ -30,6 +30,16 @@ void del_line_struct(t_line **line);
 void reset_line(t_line *line);
 void reset_cursore_position(t_line *line);
 
+void init_shell_env(t_ush *ush);
+void print_shell_env(t_ush *ush);
+void del_shell_env(t_shell_env_list *head);
+void create_shell_variable(t_ush *ush, char *variable, char *value, bool export);
+void set_shell_variable(t_ush *ush, char *variable, char *value);
+char *get_shell_variable(t_ush *ush, char *variable);
+void export_shell_variable(t_ush *ush, char *variable);
+void unset_shell_variable(t_ush *ush, char *variable);
+void del_shell_variable(t_ush *ush, char *variable);
+
 void new_command_list(t_command_list **head);
 void del_last_command(t_command_list **head);
 void del_command_list(t_command_list **head);
@@ -43,9 +53,8 @@ void new_procces_list(t_process_list **process_head);
 void del_process_list(t_process_list **process_head);
 void get_process_args(t_ush *ush, t_process *process);
 
-char *get_env_value(char *env_key);
+char *get_env_value(t_ush *ush, char *variable); //memory allocation func
 char *get_pwd(void); //memory allocation func
-char *find_value(char *str);
 void replace_str(char **src, size_t start_index, size_t length, char *str);
 uint32_t get_opt(char **argv, char *seach_opt);
 uint32_t count_args(char **argv);

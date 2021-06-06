@@ -1,7 +1,92 @@
 #include "ush.h"
 
+static void create_process_list(t_ush *ush);
+static void run_process_list(t_ush *ush);
+
+/* REV 2.0 */
+void execute(t_ush *ush) 
+{
+    if(!ush->args || !(ush->args[0]))
+        return;
+
+    create_process_list(ush);
+    // print_process_list(ush);
+    run_process_list(ush);
+    del_process_list(&ush->process_list);
+}
+
+static void (*built_in_func[]) (t_ush *, t_process *) = {
+    &exit_func,
+    &unset_func,
+    &export_func,
+    &env_func,
+    &cd_func,
+    &pwd_func,
+    &which_func,
+    &echo_func,
+    &fg_func
+};
+
+static void create_process_list(t_ush *ush)
+{
+    if(!ush->args)
+        return;
+
+    char **args_head = ush->args;
+    
+    for(; *ush->args;)
+        create_process(ush);
+
+    free(args_head);
+}
+
+static void start_process(t_process *process)
+{
+    process->status = posix_spawnp(&process->pid, process->command, 
+                                   process->actions, process->attr, 
+                                   process->args, environ);
+
+    wait(&process->pid);   
+
+    if(process->status == 2) {
+        mx_printstr("ush: ");
+        mx_printstr(process->command);
+        mx_printstr(": command not found\n");
+    }
+}
+
+/* Return index of build in command otherwise -1 */
+static int built_in_func_index(t_ush *ush, char *command)
+{
+    for(uint8_t index = 0; ush->built_in[index]; ++index) {
+        if(!mx_strcmp(ush->built_in[index], command))
+            return index;
+    }
+
+    return -1;
+}
+
+static void run_process_list(t_ush *ush)
+{
+    while(ush->process_list->prev_process)
+            ush->process_list = ush->process_list->prev_process;
+
+    while(ush->process_list) {
+        int command_index;
+
+        if((command_index = built_in_func_index(ush, ush->process_list->process->command)) != -1) {
+            built_in_func[command_index](ush, ush->process_list->process);
+        }
+        else
+            start_process(ush->process_list->process);
+
+        ush->local_status = ush->process_list->process->status;
+        ush->process_list = ush->process_list->next_process;
+    }
+}
+
 /* Debug func */
-void print_process_list(t_ush *ush)
+static void print_process_list(t_ush *ush)
 {
     if(!ush->process_list)
         mx_printstr("Empty list");
@@ -33,87 +118,4 @@ void print_process_list(t_ush *ush)
     }
 
     mx_printchar('\n');
-}
-
-void (*built_in_func[]) (t_ush *, t_process *) = {
-    &exit_func,
-    &unset_func,
-    &export_func,
-    &env_func,
-    &cd_func,
-    &pwd_func,
-    &which_func,
-    &echo_func,
-    &fg_func
-};
-
-static void create_process_list(t_ush *ush)
-{
-    if(!ush->args) {
-        return;
-    }
-
-    char **args_head = ush->args;
-    
-    for(; *ush->args;)
-        create_process(ush);
-
-    free(args_head);
-}
-
-static void start_process(t_process *process)
-{
-    process->status = posix_spawnp(&process->pid, process->command, 
-                                   process->actions, process->attr, 
-                                   process->args, environ);
-
-    wait(&process->pid);   
-
-    if(process->status == 2) {
-        mx_printstr("ush: ");
-        mx_printstr(process->command);
-        mx_printstr(": command not found\n");
-    }
-}
-
-/* Return index of build in command othrwise -1 */
-static int built_in_func_index(t_ush *ush, char *command)
-{
-    for(uint8_t index = 0; ush->built_in[index]; ++index) {
-        if(!mx_strcmp(ush->built_in[index], command))
-            return index;
-    }
-
-    return -1;
-}
-
-static void run_process_list(t_ush *ush)
-{
-    while(ush->process_list->prev_process)
-            ush->process_list = ush->process_list->prev_process;
-
-    while(ush->process_list) {
-        int command_index;
-
-        if((command_index = built_in_func_index(ush, ush->process_list->process->command)) != -1) {
-            built_in_func[command_index](ush, ush->process_list->process);
-        }
-        else
-            start_process(ush->process_list->process);
-
-        ush->local_status = ush->process_list->process->status;
-        ush->process_list = ush->process_list->next_process;
-    }
-}
-
-/* REV 2.0 */
-void execute(t_ush *ush) 
-{
-    if(!ush->args || !(ush->args[0]))
-        return;
-
-    create_process_list(ush);
-    // print_process_list(ush);
-    run_process_list(ush);
-    del_process_list(&ush->process_list);
 }
