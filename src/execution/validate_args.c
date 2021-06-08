@@ -1,19 +1,19 @@
 #include "ush.h"
 
+static void separete_args(t_ush *ush, char *line);
 static void replace_variables(t_ush *ush, char **clean_line);
 static void replace_math(char **clean_line);
 static void replace_command(char **clean_line);
 static void replace_special_symbols(t_ush *ush, char **clean_line);
-static void separete_args(t_ush *ush, char *line);
 
-void validate_args(t_ush *ush, char *line)
+void replace_args_escapes(t_ush *ush, t_process *procass)
 {
-    char *clean_line = mx_strtrim(line);
-    replace_variables(ush ,&clean_line);
-    replace_math(&clean_line);
-    replace_command(&clean_line);
-    replace_special_symbols(ush, &clean_line);
-    separete_args(ush, clean_line);
+    for(size_t index = 0; procass->args[index]; ++index) {
+        replace_variables(ush ,&procass->args[index]);
+        replace_math(&procass->args[index]);
+        replace_command(&procass->args[index]);
+        replace_special_symbols(ush, &procass->args[index]);
+    }
 }
 
 static size_t count_line_args(char *line)
@@ -53,37 +53,39 @@ static size_t count_line_args(char *line)
     return count;
 }
 
-static void separete_args(t_ush *ush, char *line)
+void validate_args(t_ush *ush, char *line)
 {
     uint32_t start = 0, word_index = 0, index = 0;
     size_t len = 0;
 
-    if(!(ush->args = (char **) calloc(count_line_args(line) + 1, sizeof(char*))))
+    char *clean_line = mx_strtrim(line);
+
+    if(!(ush->args = (char **) calloc(count_line_args(clean_line) + 1, sizeof(char*))))
         perror("ush: ");
 
-    for(; line[index]; ) {
-        if(line[index] == ' ') {       
+    for(; clean_line[index]; ) {
+        if(clean_line[index] == ' ') {       
             if((len = index - start)) { 
-                ush->args[word_index++] = mx_strndup(&line[start], len);
+                ush->args[word_index++] = mx_strndup(&clean_line[start], len);
                 ush->args[word_index] = NULL;
             }
             
-            while(line[++index] == ' ');
+            while(clean_line[++index] == ' ');
 
             start = index;
         }
-        else if(line[index] == '\"') {
+        else if(clean_line[index] == '\"') {
             if((len = index - start)) { 
-                ush->args[word_index++] = mx_strndup(&line[start], len);
+                ush->args[word_index++] = mx_strndup(&clean_line[start], len);
                 ush->args[word_index] = NULL;
             }
 
             start = ++index;
 
-            while(line[index++] != '\"');
+            while(clean_line[index++] != '\"');
 
             if((len = index - start - 1)) {
-                ush->args[word_index++] = mx_strndup(&line[start], len);
+                ush->args[word_index++] = mx_strndup(&clean_line[start], len);
                 ush->args[word_index] = NULL;
             }
 
@@ -94,7 +96,7 @@ static void separete_args(t_ush *ush, char *line)
     }
 
     if((len = index - start)) {
-        ush->args[word_index++] = mx_strndup(&line[start], len);
+        ush->args[word_index++] = mx_strndup(&clean_line[start], len);
         ush->args[word_index] = NULL;
     }
 }
@@ -161,29 +163,12 @@ static char *get_quote_content(char *line, char quotes_open, char quotes_close)
     return mx_strndup(&line[start_index], end_index - start_index);
 }
 
-// char *get_env_value(char *env_key) 
-// {
-//     char *value;
-//     int env_value_len = strlen(env_key);
-
-//     for(char **env = environ; *env != 0; env++) {
-//         if(!strncmp(env_key, *env, env_value_len) && (*env)[env_value_len] == '=') {
-//             value = (char*) calloc(strlen(&(*env)[env_value_len + 1]), sizeof(char));
-//             strcpy(value, &(*env)[++env_value_len]);
-//             return value;
-//         }
-//     }
-
-//     return NULL;
-// }
-
 char *get_env_value(t_ush *ush, char *variable) 
 {
     char *value = NULL;
 
-    if(!(value = get_shell_variable(ush, variable)))
-        if((value = getenv(variable)))
-            value = mx_strdup(value);
+    if(!(value = getenv(variable)))
+        value = get_shell_variable(ush, variable);
 
     return value;
 }
@@ -222,17 +207,23 @@ static void replace_variables(t_ush *ush, char **clean_line)
         variable = get_quote_content(&(*clean_line)[index], '{', '}');
         variable_length = strlen(variable) + 3;
         
+        if(!strcmp(variable, "?")) {
+            replace = mx_itoa(ush->local_status);
+            replace_str(clean_line, index, variable_length, replace);
+            mx_strdel(&variable);
+            continue;
+        }
+
         for(size_t i = 0; variable[i]; ++i) {
             if(!mx_isalpha(variable[i]) && !mx_isdigit(variable[i])) {
                 fprintf(stderr, "ush: %s: bad substitution\n", variable);
-                replace_str(clean_line, index, variable_length, "");
+                // replace_str(clean_line, index, variable_length, "");
                 return;
             }
         }
 
         replace  = get_env_value(ush, variable);
         replace_str(clean_line, index, variable_length, replace);
-        mx_strdel(&replace);
         mx_strdel(&variable);
     } 
 }
@@ -289,6 +280,25 @@ static void replace_command(char **clean_line)
     }
 } 
 
+static char *separete_variable(char *line)
+{
+    if(!(*line))
+        return NULL;
+
+    size_t end_index;
+    size_t line_length = strlen(line);
+    uint32_t count = 1;
+
+    for(end_index = 0; line[end_index] && count; ++end_index)
+        count -= (line[end_index] == ' '  || 
+                  line[end_index] == '\'' || 
+                  line[end_index] == '\"');
+
+    count ? end_index = line_length : --end_index;
+
+    return mx_strndup(line, end_index);
+}
+
 static void replace_special_symbols(t_ush *ush, char **clean_line)
 {
     char *variable, *replace;
@@ -298,12 +308,19 @@ static void replace_special_symbols(t_ush *ush, char **clean_line)
         replace_str(clean_line, tilda_index, 1, ush->home);
 
     while((variable_index = mx_get_char_index(*clean_line, '$')) >= 0) {
-        variable = get_quote_content(&(*clean_line)[variable_index + 1], '\0', ' ');
+        variable = separete_variable(&(*clean_line)[variable_index + 1]);
+
+        if(!strcmp(variable, "?")) {
+            replace = mx_itoa(ush->local_status);
+            replace_str(clean_line, variable_index, strlen(variable) + 1, replace);
+            mx_strdel(&variable);
+            continue;
+        }
 
         for(size_t i = 0; variable[i]; ++i) {
             if(!mx_isalpha(variable[i]) && !mx_isdigit(variable[i])) {
                 fprintf(stderr, "ush: %s: bad substitution\n", variable);
-                replace_str(clean_line, variable_index, strlen(variable) + 1, "");
+                // replace_str(clean_line, variable_index, strlen(variable) + 1, "");
                 return;
             }
         }
@@ -311,6 +328,5 @@ static void replace_special_symbols(t_ush *ush, char **clean_line)
         replace  = get_env_value(ush, variable);
         replace_str(clean_line, variable_index, strlen(variable) + 1, replace);
         mx_strdel(&variable);
-        mx_strdel(&replace);
     }
 }

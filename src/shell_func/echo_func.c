@@ -18,12 +18,13 @@ void echo_func(t_ush *ush, t_process *process)
     if(!opt_E)
         disable_special_symbols(&process->args[index]);
 
-    if(process->args[index])
-        printf("%s", process->args[index++]);
-
-    for(; process->args[index]; ++index)
-        printf("%s ", process->args[index]);
-
+    for(; process->args[index];) {
+        mx_printstr(process->args[index++]);
+        
+        if(process->args[index])
+            mx_printchar(' ');
+    }
+    
     if(!opt_n)
         printf("\n");
 

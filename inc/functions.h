@@ -20,6 +20,7 @@ void env_func(t_ush *ush, t_process *process);
 void export_func(t_ush *ush, t_process *process);
 void unset_func(t_ush *ush, t_process *process);
 void fg_func(t_ush *ush, t_process *process);
+void set_env(t_ush *ush, t_process *process);
 
 void init_ush_struct(t_ush **ush);
 void del_ush_struct(t_ush **ush);
@@ -52,10 +53,12 @@ void create_process(t_ush *ush);
 void new_procces_list(t_process_list **process_head);
 void del_process_list(t_process_list **process_head);
 void get_process_args(t_ush *ush, t_process *process);
+void replace_args_escapes(t_ush *ush, t_process *procass);
 
+void replace_str(char **src, size_t start_index, size_t length, char *str);
 char *get_env_value(t_ush *ush, char *variable); //memory allocation func
 char *get_pwd(void); //memory allocation func
-void replace_str(char **src, size_t start_index, size_t length, char *str);
+int built_in_func_index(t_ush *ush, char *command);
 uint32_t get_opt(char **argv, char *seach_opt);
 uint32_t count_args(char **argv);
 uint32_t start_index(char **argv);

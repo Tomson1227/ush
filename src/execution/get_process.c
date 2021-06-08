@@ -84,6 +84,38 @@ static void start_process(t_process *process, char **args)
     process->args[1] = NULL;
 }
 
+static void check_command(t_ush *ush)
+{
+    for(; *ush->args; ush->args++) {
+        if(built_in_func_index(ush, *ush->args) != -1)
+            return;
+
+        for(uint8_t i = 0; ush->bin_dirs[i]; ++i) {
+            char *temp = mx_strjoin(ush->bin_dirs[i], "/");
+            char *path = mx_strjoin(temp, *ush->args);
+            mx_strdel(&temp);
+
+            if(!access(path, F_OK)) {
+                mx_strdel(&path);
+                return;
+            }
+
+            mx_strdel(&path);
+        }
+                
+        int index;
+
+        if((index = mx_get_char_index(*ush->args, '=')) >= 0) {
+            char *variable = mx_strndup(*ush->args, index);
+            char *value = mx_strdup(&ush->args[0][index + 1]);
+            set_shell_variable(ush, variable, value);
+            mx_strdel(&variable);
+            mx_strdel(&value);
+            mx_strdel(ush->args);
+        }
+    }
+}
+
 void create_process(t_ush *ush)
 {
     new_procces_list(&ush->process_list);

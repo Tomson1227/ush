@@ -100,13 +100,12 @@ static t_shell_env_list *shell_list_address(t_shell_env_list *head, char *variab
     return NULL;
 }
 
-/* allocate memoty */
 char *get_shell_variable(t_ush *ush, char *variable) 
 {    
     t_shell_env_list *list_index = shell_list_address(ush->env, variable);
 
     if(list_index)
-        return mx_strdup(list_index->value);
+        return list_index->value;
 
     return NULL;
 }

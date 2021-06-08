@@ -5,7 +5,7 @@ export – The command sets environment variables.
 */
 void export_func(t_ush *ush, t_process *process)
 {
-    for(size_t index = 0; process->args[index]; ++index) {
+    for(size_t index = 1; process->args[index]; ++index) {
         int position;
         char *variable;
 

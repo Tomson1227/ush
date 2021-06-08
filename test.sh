@@ -42,14 +42,14 @@ echo "echo: ush built-in command"
 echo "/------------------------------------------------------------------------/"
 echo "Test 6 Test which with options2"
 echo "ush :"
-echo "which asdasdasdasdsa" | ./ush ; echo $?
+echo "which asdasdasdasdsa ; echo $?" | ./ush
 echo "zsh :"
 echo "asdasdasdasdsa not found\n1"
 
 echo "/------------------------------------------------------------------------/"
 echo "Test 7 Test which with options3"
 echo "ush :"
-echo "which echo" | ./ush ; echo $?
+echo "which echo ; echo $?" | ./ush ; 
 echo "zsh :"
 echo "echo: ush built-in command\n0"
 
@@ -92,6 +92,12 @@ echo "/------------------------------------------------------------------------/
 echo "Test 17 Test work with shell variables"
 echo "ush :"
 echo 'echo ${SHLVL} ${HOME} ${LOGNAME} ${USER} ${TERM}' | ./ush
+echo "zsh :"
+echo ${SHLVL} ${HOME} ${LOGNAME} ${USER} ${TERM} #"2 /Users/oracle oracle"
+
+echo "Test 17_2"
+echo "ush :"
+echo ${SHLVL} ${HOME} ${LOGNAME} ${USER} ${TERM}
 echo "zsh :"
 echo ${SHLVL} ${HOME} ${LOGNAME} ${USER} ${TERM} #"2 /Users/oracle oracle"
 
