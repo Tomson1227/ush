@@ -75,8 +75,9 @@ static void run_process_list(t_ush *ush)
             ush->process_list = ush->process_list->prev_process;
 
     while(ush->process_list) {
-        replace_args_escapes(ush, ush->process_list->process);
         int command_index = built_in_func_index(ush, ush->process_list->process->command);
+
+        replace_args_escapes(ush, ush->process_list->process);
 
         if(command_index != -1)
             built_in_func[command_index](ush, ush->process_list->process);

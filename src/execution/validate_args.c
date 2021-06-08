@@ -217,7 +217,7 @@ static void replace_variables(t_ush *ush, char **clean_line)
         for(size_t i = 0; variable[i]; ++i) {
             if(!mx_isalpha(variable[i]) && !mx_isdigit(variable[i])) {
                 fprintf(stderr, "ush: %s: bad substitution\n", variable);
-                // replace_str(clean_line, index, variable_length, "");
+                replace_str(clean_line, index, variable_length, "");
                 return;
             }
         }
@@ -320,7 +320,7 @@ static void replace_special_symbols(t_ush *ush, char **clean_line)
         for(size_t i = 0; variable[i]; ++i) {
             if(!mx_isalpha(variable[i]) && !mx_isdigit(variable[i])) {
                 fprintf(stderr, "ush: %s: bad substitution\n", variable);
-                // replace_str(clean_line, variable_index, strlen(variable) + 1, "");
+                replace_str(clean_line, variable_index, strlen(variable) + 1, "");
                 return;
             }
         }
