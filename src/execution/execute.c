@@ -110,6 +110,7 @@ static void print_process_list(t_ush *ush)
                 mx_printchar(' ');
                 mx_printstr(curent_list->process->args[i]);
             }
+            mx_printchar('\n');
         }
         
         if(curent_list->process->file) {

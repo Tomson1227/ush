@@ -16,6 +16,50 @@ void replace_args_escapes(t_ush *ush, t_process *procass)
     }
 }
 
+static size_t get_quotes_length(char *line, char start_symbol)
+{
+    size_t start_index, end_index;
+    size_t line_length = strlen(line);
+    uint8_t count_double_quotes = (start_symbol == '\"');
+    uint8_t count_single_quotes = (start_symbol == '\'');
+    uint8_t count_brackets = (start_symbol == '{');
+    uint8_t count_parentheses = (start_symbol == '(');
+
+    for(start_index = 0; line[start_index] && line[start_index]!= start_symbol; ++start_index);
+
+    (start_index == line_length) ? start_index = 0 : ++start_index;
+
+    for(end_index = start_index; line[end_index] && 
+       (count_double_quotes || count_single_quotes || 
+        count_brackets || count_parentheses); ++end_index) {
+        switch(line[end_index]) {
+            case '\"':
+                count_double_quotes--;
+                break;
+            case '\'':
+                count_single_quotes ^= 0;
+                break;
+            case '{':
+                ++count_brackets;
+                break;
+            case '}':
+                --count_brackets;
+                break;
+            case '(':
+                ++count_parentheses;
+                break;
+            case ')':
+                --count_parentheses;
+                break;
+            default:
+                break;
+        }
+    }   
+
+    (end_index + start_index == line_length) ? end_index = line_length : --end_index;
+    return end_index - start_index;
+}
+
 static size_t count_line_args(char *line)
 {
     size_t count = 0;
@@ -30,18 +74,16 @@ static size_t count_line_args(char *line)
             
             last_index = index;
         }
-        else if(line[index] == '\"') {
+        else if(line[index] == '\"' || line[index] == '\'') {
             if(last_index != index)
                 ++count;
 
-            last_index = ++index;
+            size_t arg_length = get_quotes_length(&line[index], line[index]);
 
-            while(line[index++] != '\"');
-
-            if(last_index != index)
+            if(arg_length)
                 ++count;
 
-            last_index = index;
+            last_index = index += arg_length + 2;
         }
         else
             ++index;
@@ -64,7 +106,8 @@ void validate_args(t_ush *ush, char *line)
         perror("ush: ");
 
     for(; clean_line[index]; ) {
-        if(clean_line[index] == ' ') {       
+
+        if(clean_line[index] == ' ') {  
             if((len = index - start)) { 
                 ush->args[word_index++] = mx_strndup(&clean_line[start], len);
                 ush->args[word_index] = NULL;
@@ -74,21 +117,20 @@ void validate_args(t_ush *ush, char *line)
 
             start = index;
         }
-        else if(clean_line[index] == '\"') {
+        else if(clean_line[index] == '\"' || clean_line[index] == '\'') {   
             if((len = index - start)) { 
                 ush->args[word_index++] = mx_strndup(&clean_line[start], len);
                 ush->args[word_index] = NULL;
             }
 
-            start = ++index;
+            size_t arg_length = get_quotes_length(&clean_line[index], clean_line[index]);
 
-            while(clean_line[index++] != '\"');
-
-            if((len = index - start - 1)) {
-                ush->args[word_index++] = mx_strndup(&clean_line[start], len);
+            if(arg_length) {
+                ush->args[word_index++] = mx_strndup(&clean_line[start + 1], arg_length);
                 ush->args[word_index] = NULL;
             }
 
+            index += arg_length + 2;
             start = index;
         }
         else

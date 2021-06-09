@@ -13,7 +13,9 @@ void gui_call(t_ush *ush)
 
     get_user_input(line, ush);
     validate_args(ush, line->line);
-    // print_arg(ush);
+    
+    // print_arg(ush->args);
+
     dup_command(ush->command_list, line->line);
     del_line_struct(&line);
 }
