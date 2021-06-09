@@ -33,15 +33,15 @@ void pwd_func(t_ush *ush, t_process *process)
   
     char *pwd; 
 
-    if(opt_L) {
-        pwd = get_env_value(ush, "PWD");
+    if(opt_P) {
+       pwd = realpath(".", NULL);
+       printf("%s\n", pwd);
+       free(pwd);
     }
     else {
-        pwd = realpath(".", NULL);
+        pwd = get_env_value(ush, "PWD");
+        printf("%s\n", pwd);
     }
-
-    printf("%s\n", pwd);
-    mx_strdel(&pwd);
 
     process->status = 0;
 }

@@ -36,7 +36,7 @@ void cd_func(t_ush *ush, t_process *process)
 
         set_shell_variable(ush, "OLDPWD", path);
         path = get_pwd();
-        set_shell_variable(ush, "PWD", path);
+        set_shell_variable(ush, "PWD", process->args[1]);
         mx_strdel(&path);
     }
 
