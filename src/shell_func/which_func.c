@@ -20,11 +20,8 @@ void which_func(t_ush *ush, t_process *process)
             if (!strcmp(ush->built_in[i], process->args[index])) {
                 char *message = mx_strjoin(ush->built_in[i], ": ush built-in command");
                 
-                if(opt_a || !opt_s) {
-                    printf("%s\n", message);
-                    mx_strdel(&message);
-                }
-                
+                printf("%s\n", message);
+                mx_strdel(&message);                
                 status = 0;
             }
         }
@@ -34,7 +31,7 @@ void which_func(t_ush *ush, t_process *process)
             char *path = mx_strjoin(temp, process->args[index]);
             mx_strdel(&temp);
 
-            if(!access(path, F_OK) && (opt_a || !opt_s)) {
+            if(!access(path, F_OK) && opt_a) {
                 printf("%s\n", path);
                 status = 0;
             }
@@ -42,7 +39,7 @@ void which_func(t_ush *ush, t_process *process)
             mx_strdel(&path);
         }
 
-        if(status && !opt_s)
+        if(status)
             printf("%s not found\n", process->args[index]);
 
         process->status |= status;

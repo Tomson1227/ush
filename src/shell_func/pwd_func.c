@@ -31,17 +31,15 @@ void pwd_func(t_ush *ush, t_process *process)
     uint8_t opt_L = READ_OPT(options, 1);
     uint8_t opt_P = READ_OPT(options, 2);
   
-    char *pwd; 
+    char *pwd = get_env_value(ush, "PWD");
 
     if(opt_P) {
-       pwd = realpath(".", NULL);
-       printf("%s\n", pwd);
-       free(pwd);
+        char *link = realpath(pwd, NULL);
+        printf("%s\n", link);
+        free(link);
     }
-    else {
-        pwd = get_env_value(ush, "PWD");
+    else
         printf("%s\n", pwd);
-    }
 
     process->status = 0;
 }

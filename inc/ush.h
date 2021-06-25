@@ -1,6 +1,11 @@
 #ifndef USH_H
 #define USH_H
 
+#ifdef __linux__
+    #define _XOPEN_SOURCE
+    #define _DEFAULT_SOURCE
+#endif
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>

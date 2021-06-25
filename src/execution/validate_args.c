@@ -34,10 +34,10 @@ static size_t get_quotes_length(char *line, char start_symbol)
         count_brackets || count_parentheses); ++end_index) {
         switch(line[end_index]) {
             case '\"':
-                count_double_quotes--;
+                count_double_quotes ^= 1;
                 break;
             case '\'':
-                count_single_quotes ^= 0;
+                count_single_quotes ^= 1;
                 break;
             case '{':
                 ++count_brackets;
@@ -73,6 +73,13 @@ static size_t count_line_args(char *line)
             while(line[++index] == ' ');
             
             last_index = index;
+        }
+        else if(line[index] == ';') {
+            if(last_index != index)
+                ++count;
+            
+            ++count;
+            last_index = ++index;
         }
         else if(line[index] == '\"' || line[index] == '\'') {
             if(last_index != index)
@@ -116,6 +123,17 @@ void validate_args(t_ush *ush, char *line)
             while(clean_line[++index] == ' ');
 
             start = index;
+        }
+        else if(clean_line[index] == ';') {
+            if((len = index - start)) { 
+                ush->args[word_index++] = mx_strndup(&clean_line[start], len);
+                ush->args[word_index] = NULL;
+            }
+
+            ush->args[word_index++] = mx_strndup(&clean_line[index], 1);
+            ush->args[word_index] = NULL;
+
+            start = ++index;
         }
         else if(clean_line[index] == '\"' || clean_line[index] == '\'') {   
             if((len = index - start)) { 
@@ -203,16 +221,6 @@ static char *get_quote_content(char *line, char quotes_open, char quotes_close)
     (end_index + start_index == line_length) ? end_index = line_length : --end_index;
 
     return mx_strndup(&line[start_index], end_index - start_index);
-}
-
-char *get_env_value(t_ush *ush, char *variable) 
-{
-    char *value = NULL;
-
-    if(!(value = getenv(variable)))
-        value = get_shell_variable(ush, variable);
-
-    return value;
 }
 
 static char *process_command(char *command)
@@ -329,12 +337,15 @@ static char *separete_variable(char *line)
 
     size_t end_index;
     size_t line_length = strlen(line);
-    uint32_t count = 1;
+    uint8_t count = 1;
 
-    for(end_index = 0; line[end_index] && count; ++end_index)
-        count -= (line[end_index] == ' '  || 
-                  line[end_index] == '\'' || 
-                  line[end_index] == '\"');
+    for(end_index = 0; line[end_index] && count; ++end_index) {
+        if(line[end_index] == ' '  || line[end_index] == '\'' || 
+           line[end_index] == '\"' || line[end_index] == ';') {
+            --count;
+            break;
+        }
+    }
 
     count ? end_index = line_length : --end_index;
 
@@ -354,7 +365,7 @@ static void replace_special_symbols(t_ush *ush, char **clean_line)
 
         if(!strcmp(variable, "?")) {
             replace = mx_itoa(ush->local_status);
-            replace_str(clean_line, variable_index, strlen(variable) + 1, replace);
+            replace_str(clean_line, variable_index, 2, replace);
             mx_strdel(&variable);
             continue;
         }

@@ -62,7 +62,7 @@ void init_shell_env(t_ush *ush)
     create_shell_variable(ush, "USER",    login, 1);
 
     if(strcmp(getenv("SHELL"), shell))
-        create_shell_variable(ush, "SHLVL", "1", 1);
+        create_shell_variable(ush, "SHLVL", "2", 1);
     else {
         char *level = mx_itoa(mx_atoi(getenv("SHLVL")) + 1);
         create_shell_variable(ush, "SHLVL", level, 1);
@@ -98,6 +98,16 @@ static t_shell_env_list *shell_list_address(t_shell_env_list *head, char *variab
     }
 
     return NULL;
+}
+
+char *get_env_value(t_ush *ush, char *variable) 
+{
+    char *value = NULL;
+
+    if(!(value = getenv(variable)))
+        value = get_shell_variable(ush, variable);
+
+    return value;
 }
 
 char *get_shell_variable(t_ush *ush, char *variable) 

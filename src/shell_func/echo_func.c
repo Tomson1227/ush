@@ -19,6 +19,11 @@ void echo_func(t_ush *ush, t_process *process)
         disable_special_symbols(&process->args[index]);
 
     for(; process->args[index];) {
+        if(!mx_strcmp(process->args[index], "")) {
+            ++index;
+            continue;
+        }
+        
         mx_printstr(process->args[index++]);
         
         if(process->args[index])

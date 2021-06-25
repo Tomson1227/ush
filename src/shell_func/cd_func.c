@@ -12,7 +12,7 @@ void cd_func(t_ush *ush, t_process *process)
     uint32_t options = get_opt(process->args, "sP");
     uint8_t opt_s = READ_OPT(options, 1);
     uint8_t opt_P = READ_OPT(options, 2);
-    char *path = getenv("PWD");;
+    char *path = getenv("PWD");
 
     if(argc == 1) {
         set_shell_variable(ush, "OLDPWD", path);
@@ -36,7 +36,8 @@ void cd_func(t_ush *ush, t_process *process)
 
         set_shell_variable(ush, "OLDPWD", path);
         path = get_pwd();
-        set_shell_variable(ush, "PWD", process->args[1]);
+
+        set_shell_variable(ush, "PWD", path);
         mx_strdel(&path);
     }
 
