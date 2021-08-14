@@ -1,7 +1,0 @@
-.DS_Store
-*.o
-ush
-libmx.a
-./libmx/obj
-.vscode
-file1.txt
